@@ -61,13 +61,21 @@
       "status": "em andamento",
       "devolucoes": 0,
       "fases_concluidas": [
-        "Fase 1 Setup (T001)"
+        "Fase 1 Setup (T001)",
+        "Fase 2 Foundational (T002-T005)"
       ],
-      "notas": "Fase 1 Setup concluida. Verificado no disco: package.json sem moment e sem os, com supertest ^7.3.2 em devDependencies, script test = node --test, express e ejs preservados; package-lock.json regravado no mesmo passo; app.js e views/index.ejs intocados; T001 marcado [X] em tasks.md. Portao executado por mim: npm test saiu com codigo 0 (tests 0, sem arquivos de teste ainda, conforme medido em E3.5)"
+      "notas": "Fase 1 Setup concluida. Verificado no disco: package.json sem moment e sem os, com supertest ^7.3.2 em devDependencies, script test = node --test, express e ejs preservados; package-lock.json regravado no mesmo passo; app.js e views/index.ejs intocados; T001 marcado [X] em tasks.md. Portao executado por mim: npm test saiu com codigo 0 (tests 0, sem arquivos de teste ainda, conforme medido em E3.5) | Fase 2 Foundational concluida. Verificado no disco: app.js com formatador Intl no escopo do modulo (sem try/catch, D3), funcao pura formatarDataHora via formatToParts, port lido de process.env.PORT com padrao 3000, app.listen sob require.main === module, module.exports = { app, formatarDataHora }; getIpAddress inalterada (fora de escopo, D9); views/index.ejs, package.json e package-lock.json intocados nesta fase. Portoes executados por mim: npm test exit 0; require(./app.js) carrega sem abrir porta e imprime function function; formatarDataHora(2026-07-03T12:05:07Z) = 03/07/2026 09:05:07; sob TZ=Asia/Tokyo o instante 2026-11-24T03:00:00Z = 24/11/2026 00:00:00 com 19 caracteres",
+      "premissas_tecnicas": [
+        "Desenvolvedor (Fase 2): antecipou a troca de uma linha do handler de GET / para formatarDataHora(new Date()), conteudo de T006, porque remover o require(moment) em T002 deixaria a rota quebrando em tempo de execucao (ReferenceError) sem teste para capturar, ja que T007 so chega na Fase 3. Decisao aceita pelo orquestrador: evita estado deliberadamente quebrado e nao antecipa nenhuma outra tarefa. T006 permanece desmarcada e sera confirmada na Fase 3"
+      ]
     }
   },
   "tasks_done": [
-    "T001"
+    "T001",
+    "T002",
+    "T003",
+    "T004",
+    "T005"
   ],
   "blockers": [
     "Projeto sem suite de testes em funcionamento: script test de package.json termina com erro; a criacao da verificacao automatizada integra esta entrega (Principio II da constituicao)",
@@ -85,5 +93,5 @@
       "status": "pendente"
     }
   },
-  "updated_at": "2026-11-23T01:00:00-03:00"
+  "updated_at": "2026-11-23T01:15:00-03:00"
 }
