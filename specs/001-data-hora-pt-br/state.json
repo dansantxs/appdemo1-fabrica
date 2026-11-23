@@ -1,0 +1,144 @@
+{
+  "feature": "001-data-hora-pt-br",
+  "base_branch": "main",
+  "branch": "001-data-hora-pt-br",
+  "gh_path": "gh",
+  "pull_request": "https://github.com/dansantxs/appdemo1-fabrica/pull/1",
+  "commands": {
+    "test": "npm test",
+    "lint": null,
+    "build": null
+  },
+  "last_reviewed_commit": "7b90d325c1de7a57c918cb76d2db19798387187e",
+  "stage": "AGUARDANDO_MERGE",
+  "artifacts": {
+    "specs/001-data-hora-pt-br/spec.md": "E1 (speckit-specify)",
+    "specs/001-data-hora-pt-br/checklists/requirements.md": "E1 (speckit-specify)",
+    ".specify/feature.json": "E1 (speckit-specify)",
+    "specs/001-data-hora-pt-br/tasks.md": "E3 (speckit-tasks)",
+    "specs/001-data-hora-pt-br/plan.md": "E2 (speckit-plan)",
+    "specs/001-data-hora-pt-br/research.md": "E2 (speckit-plan)",
+    "specs/001-data-hora-pt-br/data-model.md": "E2 (speckit-plan)",
+    "specs/001-data-hora-pt-br/contracts/pagina-inicial.md": "E2 (speckit-plan)",
+    "specs/001-data-hora-pt-br/quickstart.md": "E2 (speckit-plan)",
+    "specs/001-data-hora-pt-br/review-report.md": "E5 (Revisor de Codigo)",
+    "specs/001-data-hora-pt-br/qa-report.md": "E6 (QA)",
+    "test/aceite/pagina-inicial.test.js": "E6 (QA)"
+  },
+  "gates": {
+    "E0": {
+      "status": "aprovado",
+      "devolucoes": 0,
+      "notas": ".specify presente; constitution.md v1.0.0 preenchida sem placeholders; arvore de trabalho limpa; remoto origin configurado; gh autenticado como dansantxs; nenhuma feature ativa anterior"
+    },
+    "E1": {
+      "status": "aprovado",
+      "devolucoes": 0,
+      "notas": "speckit-specify concluido; rodada 1 de speckit-clarify concluida em 2026-11-23 com as respostas do humano (Q1=A mascara dd/mm/aaaa hh:mm:ss, Q2=B vermelho escuro legivel somente no valor, Q3=A somente a pagina inicial), gravadas em ## Clarifications > Session 2026-11-23; verificado no disco: 0 ocorrencias de NEEDS CLARIFICATION na spec.md e 16/16 itens marcados em checklists/requirements.md; aguardando aprovacao da spec pelo humano (Checkpoint 1)"
+    },
+    "E2": {
+      "status": "aprovado",
+      "devolucoes": 0,
+      "notas": "speckit-plan concluido. Verificado no disco: plan.md, research.md, data-model.md, contracts/pagina-inicial.md e quickstart.md presentes; 0 ocorrencias de NEEDS CLARIFICATION e de ERROR em plan.md; Constitution Check aprovado sem violacoes (avaliado antes da Fase 0 e reavaliado apos a Fase 1), Complexity Tracking nao aplicavel; comandos de verificacao declarados no plan.md e gravados em state.json.commands",
+      "premissas_tecnicas": [
+        "Arquiteto: substituir moment() por Intl.DateTimeFormat da stdlib com timeZone America/Sao_Paulo, hourCycle h23 e montagem via formatToParts, porque o locale pt-BR pronto insere virgula ('03/07/2026, 09:05:07') e reprovaria FR-003; moment sai como dependencia orfa",
+        "Arquiteto: tom do vermelho #8b0000, contraste 10,01:1 sobre fundo #ffffff pela formula do WCAG 2.1, contra o minimo de 4,5:1 de SC-007; #ff0000 reprovaria com 4,00:1",
+        "Arquiteto: exportar module.exports = { app, formatarDataHora } com app.listen condicionado a require.main === module, pre-requisito pratico do supertest exigido pelo Principio II",
+        "Arquiteto: comando de teste 'npm test' -> 'node --test' sem argumento posicional, porque 'node --test test/' falha no Node 22+ (posicional tratado como glob, MODULE_NOT_FOUND, saida 1)",
+        "Arquiteto: fuso irresolvivel lanca excecao na construcao do formatador no escopo do modulo, o processo nao sobe; falha visivel em vez de silenciosa, sem valor de recuo",
+        "Arquiteto: entram no escopo as pendencias de conformidade que sao pre-requisito da entrega (script test, moment sem fuso, exportacao do app, remocao do pacote npm os redundante) e a leitura de PORT de variavel de ambiente com padrao 3000; fica fora a renomeacao de getIpAddress -> obterEnderecoIp, registrada como divida, por ser alheia ao escopo (Principio I)",
+        "Arquiteto: dependencia nova supertest@^7 como devDependency, justificada por (a) FR-001..FR-011 e SC-001/002/006/008/009 so serem verificaveis na resposta HTTP renderizada e (b) a alternativa com stdlib exigir gestao manual de porta efemera e ciclo de vida do servidor, o que o Principio II proibe; as Restricoes Tecnicas ja fixam node:test + supertest como stack de testes. Saldo: +1 devDependency, -2 dependencias de runtime (moment e os)"
+      ]
+    },
+    "E3": {
+      "status": "aprovado",
+      "devolucoes": 0,
+      "notas": "speckit-tasks concluido. Verificado no disco: tasks.md com 10 tarefas T001-T010 no formato do Spec Kit; US1, US2 e US3 todas com tarefas rotuladas [USn]; toda descricao cita caminho de arquivo; [P] usado so em T006/T007 (arquivos distintos). Fases na ordem: 1 Setup (T001), 2 Foundational (T002-T005, sequenciais em app.js), 3 US1 (T006, T007), 4 US2 (T008), 5 US3 (T009), 6 Polish (T010). Testes de aceite em test/aceite/ ficaram de fora por serem responsabilidade do QA em E6"
+    },
+    "E3.5": {
+      "status": "aprovado",
+      "devolucoes": 0,
+      "notas": "speckit-analyze executado pelo orquestrador (somente leitura). 0 achados CRITICAL. Cobertura por tarefa 11/16 (69%). Achados nao bloqueantes, a levar para a descricao do PR: C1 MEDIUM - FR-006, FR-008, FR-009, FR-010 e SC-009 sem tarefa, cobertura deliberadamente atribuida ao QA em test/aceite/ (exigir no handoff de E6 as assercoes de contracts/pagina-inicial.md secao 2); C2 LOW - SC-003, SC-004 e SC-005 so com verificacao manual do quickstart, exigir evidencia no qa-report.md; F1 LOW - deriva de rotulo de etapa, plan.md chama os testes de aceite do QA de E5 enquanto no fluxo da fabrica QA e E6; F2 LOW - T007 declara dependencia de T003 mas precisa do module.exports de T005, resolvido pelo portao da Fase 2. Medicao propria do orquestrador: 'node --test' sem nenhum arquivo de teste sai com codigo 0 (tests 0), caso ausente das medicoes de research.md D6, portanto o portao apos a fase de Setup nao falha por ausencia de testes"
+    },
+    "E4": {
+      "status": "aprovado",
+      "devolucoes": 0,
+      "fases_concluidas": [
+        "Fase 1 Setup (T001)",
+        "Fase 2 Foundational (T002-T005)",
+        "Fase 3 US1 (T006, T007)",
+        "Fase 4 US2 (T008)",
+        "Fase 5 US3 (T009)",
+        "Fase 6 Polish (T010)"
+      ],
+      "notas": "Fase 1 Setup concluida. Verificado no disco: package.json sem moment e sem os, com supertest ^7.3.2 em devDependencies, script test = node --test, express e ejs preservados; package-lock.json regravado no mesmo passo; app.js e views/index.ejs intocados; T001 marcado [X] em tasks.md. Portao executado por mim: npm test saiu com codigo 0 (tests 0, sem arquivos de teste ainda, conforme medido em E3.5) | Fase 2 Foundational concluida. Verificado no disco: app.js com formatador Intl no escopo do modulo (sem try/catch, D3), funcao pura formatarDataHora via formatToParts, port lido de process.env.PORT com padrao 3000, app.listen sob require.main === module, module.exports = { app, formatarDataHora }; getIpAddress inalterada (fora de escopo, D9); views/index.ejs, package.json e package-lock.json intocados nesta fase. Portoes executados por mim: npm test exit 0; require(./app.js) carrega sem abrir porta e imprime function function; formatarDataHora(2026-07-03T12:05:07Z) = 03/07/2026 09:05:07; sob TZ=Asia/Tokyo o instante 2026-11-24T03:00:00Z = 24/11/2026 00:00:00 com 19 caracteres | Fase 3 US1 concluida. T006 conferida (handler de GET / usa formatarDataHora(new Date()), instante lido por requisicao, sem cache) e T007 criada: test/unidade/data-hora.test.js com os 5 pares de referencia do contrato (cadeia exata + 19 caracteres) e o teste de invariancia a process.env.TZ. Portoes executados por mim: npm test = 6 tests, 6 pass, 0 fail, exit 0; TZ=UTC npm test exit 0; TZ=Asia/Tokyo npm test exit 0; resultado identico em execucoes repetidas | Fases 4 e 5 concluidas. T008: views/index.ejs com span style=color: #8b0000 envolvendo somente o valor, rotulo Hora Atual do Servidor fora do span, demais linhas (IP, h1, title, lang=pt-br) identicas, sem script/style/CSS externo. T009: dois testes novos de ausencia de cache em test/unidade/data-hora.test.js, sem alterar os 6 anteriores. Portoes executados por mim: npm test = 8 tests, 8 pass, 0 fail, exit 0; HTML renderizado conferido pelo Desenvolvedor via http+fetch, sem script, fetch(, setInterval nem http-equiv=refresh | Fase 6 Polish concluida e E4 APROVADA. Verificado por mim no disco: 0 tarefas pendentes e 10 marcadas [X] em tasks.md; npm test exit 0. T010 executou 6 verificacoes (3x npm test + TZ=UTC + TZ=America/Sao_Paulo + TZ=Asia/Tokyo), todas com 8 tests, 8 pass, 0 fail, exit 0. Nenhum arquivo de controle na raiz do projeto",
+      "premissas_tecnicas": [
+        "Desenvolvedor (Fase 2): antecipou a troca de uma linha do handler de GET / para formatarDataHora(new Date()), conteudo de T006, porque remover o require(moment) em T002 deixaria a rota quebrando em tempo de execucao (ReferenceError) sem teste para capturar, ja que T007 so chega na Fase 3. Decisao aceita pelo orquestrador: evita estado deliberadamente quebrado e nao antecipa nenhuma outra tarefa. T006 permanece desmarcada e sera confirmada na Fase 3",
+        "Desenvolvedor (Fase 3): uso de describe/test do node:test para agrupar os casos sob o nome da funcao, decisao de estilo, sem efeito sobre API ou contrato"
+      ]
+    },
+    "E5": {
+      "status": "aprovado",
+      "devolucoes": 0,
+      "parecer": "aprovado com ressalvas",
+      "intervalo_revisado": "main...HEAD",
+      "notas": "review-report.md presente no disco, nenhum achado bloqueante. npm test medido pelo Revisor: 8 tests, 8 pass, 0 fail, exit 0. Ressalvas nao bloqueantes para a descricao do PR: R1 Alto - HTML/HTTP observavel sem teste neste diff (FR-005, FR-008, FR-009, FR-010, SC-007, SC-008, SC-009 sem verificacao; FR-001, FR-006, FR-007 parciais), destinatario QA em E6; R2 Medio - o teste de invariancia de fuso muta process.env.TZ em tempo de execucao depois que o Intl.DateTimeFormat ja foi construido, e um Intl ja construido nao reassocia o fuso, logo o teste nao pegaria a regressao de esquecer o timeZone num host cujo fuso ja e America/Sao_Paulo; a prova real e rodar a suite com TZ no ambiente (feito em T010, mas nao codificado); recomendacao: somar um teste com child_process e env TZ; R3 Baixo - app.js linha 24 usa partes.find(...).value sem guarda, caminho inalcancavel, sem acao recomendada para nao contrariar o Principio I; R4 Baixo - horario de verao eventual sem par de referencia, comportamento medido como correto (2018-01-15T02:30:00Z = 15/01/2018 00:30:00); R5 Sugestao - process.env.PORT || 3000 descarta PORT=0, nenhum requisito afetado; R6 Sugestao - a justificativa (a)/(b) do supertest precisa constar do corpo do PR, exigencia do Principio I"
+    },
+    "E6": {
+      "status": "aprovado",
+      "devolucoes": 1,
+      "parecer": "aprovado",
+      "notas": "qa-report.md e test/aceite/pagina-inicial.test.js presentes no disco. 31 testes de aceite criados pelo QA, somados aos 8 unitarios: suite com 39 testes. Portoes executados por mim: npm test = 39 tests, 39 pass, 0 fail, exit 0; TZ=UTC exit 0; TZ=Asia/Tokyo exit 0. Zero defeitos (0 criticos, 0 altos, 0 medios, 0 baixos). Ressalvas do Revisor fechadas: R1 coberta pelos testes de HTML/HTTP (status 200, Content-Type, elementos obrigatorios H1-H9, proibicoes P1-P5, mascara, destaque, rotulo, ausencia de script/refresh); R2 fechada com testes que carregam app.js em processo filho sob TZ UTC, America/Sao_Paulo, Asia/Tokyo e America/Los_Angeles, provando a independencia real de fuso; R4 coberta por caso historico de horario de verao (2018-01-15 com offset -02:00). Nenhum arquivo de producao foi alterado pelo QA | RODADA 2 APROVADA: C1 fechado com assert.notEqual efetivo em SC-005 e teste novo de janela de tolerancia usando formatarDataHora como oraculo (FR-001); C2 fechado com os identificadores renomeados para portugues; qa-report.md corrigido para registrar C1 como defeito de teste da rodada de revisao. Portao final executado por mim: npm test = 40 tests, 40 pass, 0 fail, exit 0"
+    },
+    "E5b": {
+      "status": "aprovado",
+      "devolucoes": 0,
+      "parecer": "aprovado com ressalvas (rodada 2)",
+      "escopo": "somente test/aceite/pagina-inicial.test.js, testes criados pelo QA em E6",
+      "notas": "Revisao complementar dos testes do QA. Achados bloqueantes devolvidos ao QA: C1 Critico - FR-001 e FR-007/SC-005 sem assercao que os verifique; o Revisor provou por mutacao do codigo de producao em copia isolada que a suite do QA passa 31/31 com o valor congelado no carregamento do modulo e tambem com a data fixa 01/01/2000 00:00:00; as linhas 240-263 capturam valor1 e valor2, esperam 1100 ms e nunca os comparam, e o comentario justifica a omissao como probabilistica, o que e falso com intervalo maior que 1 s; o qa-report.md declara esses requisitos cobertos e zero defeitos, precisa ser corrigido. C2 Alto, portao do Principio V - identificadores novos em ingles no teste (htmlBody, scriptPath, child, match). Ressalvas anteriores: R2 fechada (o mutante sem timeZone quebra a suite), R4 fechada, R1 parcialmente fechada (faltam justamente FR-001 e FR-007). Nao bloqueantes N1 a N6 registrados no review-report.md, com destaque para N1: a assercao de IPv4 falha em host sem interface externa, falso vermelho | RODADA 2: C1 e C2 FECHADOS, confirmados por mutacao reproduzida pelo proprio Revisor em copia isolada (controle 40/40 exit 0): M1 valor congelado -> 38 pass / 2 fail; M2 data fixa 01/01/2000 -> 38 pass / 2 fail; M3 remocao do timeZone -> 37 pass / 3 fail; cada mutante rodado 2x com resultado identico. Estabilidade: 9 execucoes 40/40, incluindo TZ=UTC, Asia/Tokyo, America/Los_Angeles e Pacific/Kiritimati. Integridade confirmada: nenhum arquivo de producao alterado na rodada, nenhum teste removido ou enfraquecido (31 -> 32 testes de aceite). Novas ressalvas nao bloqueantes: N7 - o teste de janela de tolerancia, executado isolado, passa contra M1 porque o valor congelado ainda cai na janela de mais ou menos 1000 ms logo apos o require; o killer deterministico de M1 e o assert.notEqual de SC-005, por isso C1 segue fechado; N8 - o qa-report.md tem passagens desatualizadas apos a correcao (secao 7 sobre SC-005 contradiz o assert.notEqual, apendices reproduzem o codigo anterior e os nomes antigos child/scriptPath, secao 6 diz 31 testes, secao 2 cita tres fusos onde a 4-R2 cita dois, secao 11 traz all 11 checks passed em ingles)"
+    },
+    "E7": {
+      "status": "aprovado",
+      "devolucoes": 0,
+      "notas": "Sincronizacao com a base: git fetch origin e git merge origin/main -> Already up to date, sem conflito (origin/main em fbfe191). Nenhum arquivo sensivel no diff (checagem por .env, .pem, .key, secret, credential). Push de 001-data-hora-pt-br feito, PR 1 aberto para main, MERGEABLE, state OPEN. REPOSITORIO SEM CI: .github/workflows nao existe e gh pr checks responde no checks reported; conforme a regra do fluxo, a validacao de E7 passou a ser a execucao local por mim de todos os comandos de state.json.commands: npm test exit 0 (lint e build sao null neste projeto). A criacao da CI esta registrada como pendencia na descricao do PR"
+    }
+  },
+  "tasks_done": [
+    "T001",
+    "T002",
+    "T003",
+    "T004",
+    "T005",
+    "T006",
+    "T007",
+    "T008",
+    "T009",
+    "T010"
+  ],
+  "blockers": [
+    "Projeto sem suite de testes em funcionamento: script test de package.json termina com erro; a criacao da verificacao automatizada integra esta entrega (Principio II da constituicao)",
+    ".specify/extensions.yml ausente: nenhum hook git do Spec Kit registrado; branch e commits sao feitos pelo orquestrador",
+    "Divergencia desta instalacao do Spec Kit: .specify/scripts/bash/update-agent-context.sh nao existe (o nome so aparece em um comentario de common.sh) e o fluxo da skill speckit-plan instalada nao preve esse passo; confirmado por mim no disco. Nenhum arquivo de contexto do agente foi criado ou alterado na raiz. Reportar ao humano no encerramento",
+    "Divida tecnica fora do escopo desta feature (decisao do Arquiteto, Principio I): getIpAddress em app.js permanece em ingles, contrariando o Principio V; renomeacao exige feature propria",
+    "Repositorio sem CI configurada (.github/workflows ausente): a validacao de E7 foi feita por execucao local dos comandos de verificacao. A criacao da CI ficou registrada como pendencia na descricao do PR, nao foi criada por nao constar do escopo aprovado"
+  ],
+  "human_checkpoints": {
+    "specification_review": {
+      "status": "aprovado",
+      "aprovado_em": "2026-11-23T00:15:00-03:00",
+      "mensagem": "Aprovado, pode seguir"
+    },
+    "merge_approval": {
+      "status": "pendente"
+    }
+  },
+  "updated_at": "2026-11-23T03:15:00-03:00",
+  "rodadas_correcao": {
+    "total": 1,
+    "limite": 5,
+    "historico": [
+      "Rodada 1: revisao dos testes do QA (E5b) reprovou com C1 Critico e C2 Alto; devolucao ao QA",
+      "Rodada 1 encerrada: QA fechou C1 e C2; verificacao do Revisor aprovou com ressalvas N7 e N8. Total de rodadas de correcao usadas: 1 de 5"
+    ]
+  }
+}
