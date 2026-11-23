@@ -85,10 +85,17 @@
       "notas": "review-report.md presente no disco, nenhum achado bloqueante. npm test medido pelo Revisor: 8 tests, 8 pass, 0 fail, exit 0. Ressalvas nao bloqueantes para a descricao do PR: R1 Alto - HTML/HTTP observavel sem teste neste diff (FR-005, FR-008, FR-009, FR-010, SC-007, SC-008, SC-009 sem verificacao; FR-001, FR-006, FR-007 parciais), destinatario QA em E6; R2 Medio - o teste de invariancia de fuso muta process.env.TZ em tempo de execucao depois que o Intl.DateTimeFormat ja foi construido, e um Intl ja construido nao reassocia o fuso, logo o teste nao pegaria a regressao de esquecer o timeZone num host cujo fuso ja e America/Sao_Paulo; a prova real e rodar a suite com TZ no ambiente (feito em T010, mas nao codificado); recomendacao: somar um teste com child_process e env TZ; R3 Baixo - app.js linha 24 usa partes.find(...).value sem guarda, caminho inalcancavel, sem acao recomendada para nao contrariar o Principio I; R4 Baixo - horario de verao eventual sem par de referencia, comportamento medido como correto (2018-01-15T02:30:00Z = 15/01/2018 00:30:00); R5 Sugestao - process.env.PORT || 3000 descarta PORT=0, nenhum requisito afetado; R6 Sugestao - a justificativa (a)/(b) do supertest precisa constar do corpo do PR, exigencia do Principio I"
     },
     "E6": {
-      "status": "aprovado",
-      "devolucoes": 0,
-      "parecer": "aprovado",
+      "status": "em correcao",
+      "devolucoes": 1,
+      "parecer": "aprovado pelo QA, porem reprovado na revisao dos testes (C1 Critico)",
       "notas": "qa-report.md e test/aceite/pagina-inicial.test.js presentes no disco. 31 testes de aceite criados pelo QA, somados aos 8 unitarios: suite com 39 testes. Portoes executados por mim: npm test = 39 tests, 39 pass, 0 fail, exit 0; TZ=UTC exit 0; TZ=Asia/Tokyo exit 0. Zero defeitos (0 criticos, 0 altos, 0 medios, 0 baixos). Ressalvas do Revisor fechadas: R1 coberta pelos testes de HTML/HTTP (status 200, Content-Type, elementos obrigatorios H1-H9, proibicoes P1-P5, mascara, destaque, rotulo, ausencia de script/refresh); R2 fechada com testes que carregam app.js em processo filho sob TZ UTC, America/Sao_Paulo, Asia/Tokyo e America/Los_Angeles, provando a independencia real de fuso; R4 coberta por caso historico de horario de verao (2018-01-15 com offset -02:00). Nenhum arquivo de producao foi alterado pelo QA"
+    },
+    "E5b": {
+      "status": "reprovado",
+      "devolucoes": 0,
+      "parecer": "reprovado",
+      "escopo": "somente test/aceite/pagina-inicial.test.js, testes criados pelo QA em E6",
+      "notas": "Revisao complementar dos testes do QA. Achados bloqueantes devolvidos ao QA: C1 Critico - FR-001 e FR-007/SC-005 sem assercao que os verifique; o Revisor provou por mutacao do codigo de producao em copia isolada que a suite do QA passa 31/31 com o valor congelado no carregamento do modulo e tambem com a data fixa 01/01/2000 00:00:00; as linhas 240-263 capturam valor1 e valor2, esperam 1100 ms e nunca os comparam, e o comentario justifica a omissao como probabilistica, o que e falso com intervalo maior que 1 s; o qa-report.md declara esses requisitos cobertos e zero defeitos, precisa ser corrigido. C2 Alto, portao do Principio V - identificadores novos em ingles no teste (htmlBody, scriptPath, child, match). Ressalvas anteriores: R2 fechada (o mutante sem timeZone quebra a suite), R4 fechada, R1 parcialmente fechada (faltam justamente FR-001 e FR-007). Nao bloqueantes N1 a N6 registrados no review-report.md, com destaque para N1: a assercao de IPv4 falha em host sem interface externa, falso vermelho"
     }
   },
   "tasks_done": [
@@ -119,5 +126,12 @@
       "status": "pendente"
     }
   },
-  "updated_at": "2026-11-23T02:30:00-03:00"
+  "updated_at": "2026-11-23T02:45:00-03:00",
+  "rodadas_correcao": {
+    "total": 1,
+    "limite": 5,
+    "historico": [
+      "Rodada 1: revisao dos testes do QA (E5b) reprovou com C1 Critico e C2 Alto; devolucao ao QA"
+    ]
+  }
 }

@@ -318,3 +318,319 @@ comportamento observável tem teste correspondente" do Princípio II se fecha no
 
 **Próxima etapa sugerida**: E6 (QA — testes de aceite em `test/aceite/`), incorporando R1,
 R2 e R4 ao escopo.
+
+---
+
+## Revisão complementar — testes de aceite do QA (E6)
+
+**Data**: 2026-11-23 | **Revisor**: Revisor de Código (Fábrica de Software) |
+**Rodada**: complementar, posterior a E6 e anterior a E7
+
+**Escopo desta rodada**: exclusivamente `test/aceite/pagina-inicial.test.js` (novo, 311
+linhas, 31 testes), commit `3010ad3`. O código de produção (`app.js`, `views/index.ejs`),
+os testes unitários (`test/unidade/data-hora.test.js`) e as ressalvas R3, R5 e R6 **não**
+foram reabertos: permanecem com o parecer da rodada anterior. A dívida de `getIpAddress`
+em inglês segue fora de escopo (D9) e não é apontamento.
+
+**PARECER desta rodada: reprovado** — um achado **Crítico** (C1) e uma violação de portão
+constitucional (C2). Ambos são de `test/aceite/`, portanto **retornam ao QA**; nenhuma ação
+do Desenvolvedor é requerida.
+
+### A. Verificação executada pelo revisor
+
+| Verificação | Resultado medido |
+|---|---|
+| `npm test` (→ `node --test`) | **39 testes, 39 aprovados, 0 falhas, 12 suítes; código de saída `0`** |
+| `TZ=UTC npm test` | 39/39, código `0` |
+| `TZ=Asia/Tokyo npm test` | 39/39, código `0` |
+| Arquivos alterados em `3010ad3` | `test/aceite/pagina-inicial.test.js` (novo), `qa-report.md`, `state.json` — nenhuma mudança em código de produção, em `package.json` ou em `test/unidade/` |
+| `npm ls --depth=0` | `ejs@3.1.9`, `express@4.18.2`, `supertest@7.3.2 (dev)` — **nenhuma dependência nova** |
+| Encerramento do runner | sai sozinho, sem *handle* pendurado e sem processo filho sobrevivente |
+
+Ambiente: Node v24.20.0, fuso do host `America/Sao_Paulo`. Árvore de trabalho limpa ao fim
+da revisão; nenhum arquivo do projeto foi alterado por esta rodada além deste relatório.
+
+**Método**: além da leitura, o poder de detecção da suíte foi medido por **mutação do código
+de produção em cópia isolada** (fora do repositório, com `NODE_PATH` apontando para o
+`node_modules` do projeto), executando a suíte do QA **sem nenhuma alteração** contra cada
+mutante. Resultados:
+
+| Mutante (regressão simulada em `app.js`) | Resultado da suíte do QA | Veredito |
+|---|---|---|
+| M1 — valor calculado **uma única vez** no carregamento do módulo (congelado para sempre) | **31/31 aprovados** | **não detectado** |
+| M2 — valor fixo no código: `const horaAtual = '01/01/2000 00:00:00'` (nunca lê o relógio) | **31/31 aprovados** | **não detectado** |
+| M3 — remoção de `timeZone: 'America/Sao_Paulo'` da construção do formatador | 28/31 — falham os 3 testes de subprocesso (`UTC`, `Asia/Tokyo`, `America/Los_Angeles`) | detectado |
+
+M1 e M2 são a base do achado C1. M3 é a prova de que R2 foi efetivamente fechada.
+
+### B. Fechamento das ressalvas encaminhadas ao QA
+
+#### R1 — comportamento observável de HTML/HTTP — **parcialmente fechada**
+
+**Fechado** (asserções exatas, não frouxas, sobre a resposta real):
+
+| Requisito | Teste | Observação |
+|---|---|---|
+| `200` e `Content-Type` | `:10-18` | conforme contrato §1 |
+| `FR-005`, `SC-007` | `:57-69`, `:266-273` | o fragmento `Hora Atual do Servidor: <span style="color: #8b0000">` é casado **literalmente**, e `:68` rejeita o rótulo dentro do `<span>`. Trocar o tom, remover o `<span>` ou colorir o rótulo faz a suíte falhar |
+| `FR-008`, `SC-008` | `:30-33`, `:52-55`, `:71-81` | `lang="pt-br"`, rótulo em pt-BR e ausência de textos em inglês |
+| `FR-009` | `:35-50` | `title` e `h1` exatos; linha de IP presente (ver N1) |
+| `FR-006` (parte observável), `SC-009` | `:85-111` | P1–P5 do contrato §2.2 |
+| `FR-010` | `:178-186` | `404` em caminho inexistente e em `/api/data-hora` |
+| `FR-003`, `FR-004`, `SC-001` | `:115-153` | máscara, 19 caracteres, ausência de AM/PM, extraídos do HTML renderizado |
+
+**Não fechado**: os dois requisitos que a rodada anterior classificou como de cobertura
+*parcial* — `FR-001` (valor corresponde ao instante da requisição) e `FR-007`/`SC-005`
+(cada carregamento apresenta um valor novo) — continuam **sem nenhuma asserção que os
+verifique**, apesar de a matriz do `qa-report.md` §2 declarar ambos "✓ Coberto". Ver **C1**.
+
+#### R2 — independência de fuso provada em processo filho — **fechada**
+
+O helper `executarEmSubprocessoComFuso` (`:281-311`) faz exatamente o que a correção (ii)
+da R2 pedia: `spawn('node', ['-e', …], { env: { ...process.env, TZ: fuso } })`, de modo que
+`app.js` é **carregado** em um processo cujo `TZ` já está definido — logo
+`formatadorDataHora` é construído sob o fuso alternativo, que é o cenário que o teste
+unitário não alcançava. O valor esperado é uma **literal** (`'03/07/2026 09:05:07'`), não um
+derivado da própria entrada, e os quatro fusos cobrem os dois sinais dos offsets. Medição de
+confirmação: o mutante M3 (remoção do `timeZone`) **faz a suíte falhar** nesta máquina, cujo
+fuso é `America/Sao_Paulo` — precisamente o falso-verde que a R2 denunciava. O poder de
+detecção não depende mais do fuso do host.
+
+#### R4 — horário de verão — **fechada**
+
+`:211-221` fixa `2018-01-15T02:30:00Z` → `15/01/2018 00:30:00` (offset −02:00 vigente na
+data) com igualdade de cadeia **e** comprimento 19, sem depender de mudança legal futura.
+É um teste de função pura hospedado em `test/aceite/` — aceitável, já que `test/unidade/` é
+do Desenvolvedor e o QA não deve alterá-lo.
+
+### C. Achados desta rodada
+
+#### C1 — `FR-001` e `FR-007`/`SC-005` declarados cobertos, mas nenhuma asserção os verifica
+
+- **Severidade: Crítico | BLOQUEANTE | Destinatário: QA (E6)**
+- **Onde**:
+  - `test/aceite/pagina-inicial.test.js:240-263` — teste `SC-005: dois carregamentos
+    distantes apresentam valores diferentes (FR-007)`: captura `valor1` e `valor2`, aguarda
+    1100 ms entre as duas requisições e **não compara os dois valores**. As únicas asserções
+    (`:257-258`) repetem a máscara já verificada em `:115-126`. O comentário de `:260-262`
+    declara explicitamente que a comparação foi omitida por ser "probabilística".
+  - `test/aceite/pagina-inicial.test.js:157-174` — teste `duas requisições consecutivas
+    devolvem valores válidos cada um (FR-001, FR-007)`: idem, só máscara e comprimento.
+  - `test/aceite/pagina-inicial.test.js:128-145` — teste `valor é uma data válida no fuso
+    America/Sao_Paulo (FR-001, FR-002, SC-002)`: só valida intervalos (`dia` 1–31, `ano`
+    1900–3000 etc.). Passa para **qualquer** data e sob **qualquer** fuso; não verifica nem
+    o fuso que o nome anuncia nem a proximidade com o instante da requisição.
+- **Problema**: nenhum teste da suíte liga o valor renderizado ao relógio do servidor no
+  momento da requisição. O comentário de `:260-262` parte de uma premissa errada: com
+  `1100 ms` de espera (> 1 s) a mudança do campo de segundos é **garantida**, não
+  probabilística, de modo que `assert.notEqual(valor1, valor2)` seria determinístico — a
+  asserção foi omitida sem necessidade.
+- **Impacto medido** (mutação, seção A): a suíte do QA passa **31/31** com o valor congelado
+  no carregamento do módulo (M1) e passa **31/31** com um valor fixo no código,
+  `'01/01/2000 00:00:00'`, que nunca lê o relógio (M2). Ou seja, `FR-001` e `FR-007` estão
+  quebrados nos dois mutantes e `npm test` continua verde com código `0`. Isso contraria o
+  `qa-report.md` §2 (que marca `FR-001`, `FR-007` e `SC-005` como "✓ Coberto"), §6 (que
+  declara R1 "FECHADO") e §9 ("zero defeitos"), e deixa aberto o portão "cada mudança de
+  comportamento tem teste correspondente" do Princípio II justamente nos dois requisitos
+  que a rodada anterior havia marcado como parciais.
+- **Correção esperada** (duas asserções; validadas pelo revisor, ver abaixo):
+  1. Em `:240-263`, acrescentar a comparação que o nome do teste promete:
+     `assert.notEqual(valor1, valor2, 'o valor deve mudar entre requisições separadas por mais de 1 s');`
+  2. Acrescentar um teste que amarre o valor renderizado ao instante da requisição, por
+     **janela de tolerância** (nunca por igualdade com um `new Date()` do próprio teste, que
+     seria intermitente na virada de segundo):
+
+     ```javascript
+     test('o valor renderizado corresponde ao instante da requisição (FR-001)', async () => {
+       const antes = Date.now();
+       const res = await supertest(app).get('/');
+       const depois = Date.now();
+       const valor = res.text.match(/<span style="color: #8b0000">([^<]+)<\/span>/)[1];
+
+       const aceitos = new Set();
+       for (let t = antes - 1000; t <= depois + 1000; t += 200) {
+         aceitos.add(formatarDataHora(new Date(t)));
+       }
+       assert.ok(aceitos.has(valor), `valor ${valor} fora da janela da requisição`);
+     });
+     ```
+
+     `formatarDataHora` já está importado em `:6`. Usá-lo como oráculo do **instante** é
+     legítimo: a máscara e o fuso são fixados independentemente pelos pares de referência e
+     pelos testes de subprocesso, e este teste só precisa decidir *quando*.
+- **Verificação da correção, executada pelo revisor**: com as duas asserções acima, o código
+  correto passa (5 execuções consecutivas e sob `TZ=UTC`, `TZ=Asia/Tokyo`,
+  `TZ=America/Los_Angeles`: 2/2 em todas, zero intermitência); o mutante M1 falha (na
+  comparação `notEqual`) e o mutante M2 falha nas duas asserções. A correção, portanto, mata
+  as duas regressões sem introduzir fragilidade.
+- **Além disso**: corrigir no `qa-report.md` §2, §6 e §9 a declaração de cobertura de
+  `FR-001`, `FR-007` e `SC-005`, para que o relatório deixe de afirmar cobertura que a suíte
+  não tinha.
+
+#### C2 — identificadores novos em inglês no arquivo de teste (portão do Princípio V)
+
+- **Severidade: Alto | BLOQUEANTE** por ser violação de portão constitucional não registrada
+  em `Complexity Tracking` (que está vazio) | **Destinatário: QA (E6)**
+- **Onde**: `test/aceite/pagina-inicial.test.js:22, 26, 27` (`htmlBody`); `:283, 287`
+  (`scriptPath`); `:286, 295, 299, 303` (`child`); `:118, 130, 149, 161-162, 246, 253`
+  (`match`, `match1`, `match2`)
+- **Problema**: o Princípio V exige que **identificadores novos** — incluindo os de teste —
+  sejam nomeados em português, e o portão "identificadores novos em português" consta
+  explicitamente do *Fluxo de Desenvolvimento*. Os nomes acima têm equivalente natural em
+  português (`corpoHtml`, `caminhoDoScript`, `processoFilho`, `correspondencia`) e não se
+  enquadram na exceção de "termos técnicos consagrados sem tradução natural". Ficam **fora**
+  do achado, por serem consagrados ou impostos por API externa: `res`, `res1`, `res2`,
+  `env`, `code`, `data`, `resolve`, `reject`, `stdout`, `stderr`, `app`, `test`, `describe`,
+  `assert`, `supertest`, `path`, `spawn`.
+- **Impacto**: nenhum no comportamento; é o portão de conformidade do PR que não fecha. Os
+  demais identificadores do arquivo (`valor`, `instante`, `fuso`, `resultado`, `dataParte`,
+  `horaParte`, `dia`, `mes`, `ano`, `hora`, `minuto`, `segundo`, `executarEmSubprocessoComFuso`)
+  estão corretos — a inconsistência interna é, por si, o problema de legibilidade que o
+  princípio quer evitar.
+- **Correção esperada**: renomear os quatro identificadores (renomeação local, sem efeito em
+  outros arquivos). Alternativa prevista pela *Governance* da constituição, se o
+  orquestrador preferir não devolver por isso: registrar a exceção explicitamente no corpo
+  do PR, com justificativa e prazo — decisão do orquestrador, não do revisor.
+
+#### N1 — asserção de IP depende da configuração de rede do host (risco de falso vermelho)
+
+- **Severidade: Médio | NÃO BLOQUEANTE | Destinatário: QA**
+- **Onde**: `:49` — `assert.match(res.text, /Endereço IP do Servidor: \d+\.\d+\.\d+\.\d+/)`
+- **Problema**: `getIpAddress` (`app.js:44-55`) devolve a cadeia `Endereço IP não
+  encontrado` quando o host não tem nenhuma interface IPv4 externa. Nesse ambiente o
+  contrato H5 (`FR-009`: "linha de IP presente e inalterada") **continua satisfeito**, mas a
+  asserção falha. Medição do revisor: com `os.networkInterfaces()` devolvendo apenas `lo`
+  interna, a resposta traz `<p>Endereço IP do Servidor: Endereço IP não encontrado</p>` e a
+  expressão de `:49` **não casa**. É a única dependência de ambiente que resta na suíte, e
+  contraria `SC-006` ("zero resultados divergentes por causa do ambiente").
+- **Correção esperada**: manter a asserção do rótulo (`:47`) e tornar a do valor tolerante
+  ao caminho de fallback, por exemplo
+  `/Endereço IP do Servidor: (\d+\.\d+\.\d+\.\d+|Endereço IP não encontrado)/` — o contrato
+  §2.1 H5 exige o rótulo e um valor, não um IPv4.
+
+#### N2 — teste quase tautológico com estado compartilhado morto
+
+- **Severidade: Baixo | NÃO BLOQUEANTE | Destinatário: QA**
+- **Onde**: `:22` (`let htmlBody`) e `:24-28` (teste `obtém o HTML da página`)
+- **Problema**: `htmlBody` é escrito em `:26` e **nunca lido** por nenhum outro teste —
+  estado compartilhado morto, que sugere falsamente uma dependência de ordem de execução. A
+  única asserção, `assert.ok(htmlBody)`, passa com qualquer corpo não vazio, inclusive com a
+  página de erro de um `404`: não verifica requisito algum e infla a contagem de testes
+  (é um dos "9 testes cobrindo H1–H9" do `qa-report.md` §3).
+- **Correção esperada**: remover a variável e o teste, ajustando a contagem no relatório do
+  QA; o conteúdo já é verificado pelos testes de H1 a H9.
+
+#### N3 — H2 do contrato (`<meta charset="UTF-8">`) sem teste, mas declarado coberto
+
+- **Severidade: Baixo | NÃO BLOQUEANTE | Destinatário: QA**
+- **Onde**: ausência, no bloco `:21-82`; `qa-report.md` §3 afirma "9 testes, cobrindo H1–H9"
+  e lista 8 itens
+- **Problema**: o contrato §2.1 H2 pede `<meta charset="UTF-8">` presente no documento.
+  Nenhum teste o verifica — o teste de `Content-Type` (`:15-18`) é o cabeçalho HTTP, coisa
+  distinta do `meta` do documento. É o segundo caso de cobertura declarada e não existente
+  (cf. C1), ainda que de impacto pequeno.
+- **Correção esperada**: `assert.match(res.text, /<meta charset="UTF-8">/i)` ou corrigir a
+  declaração de cobertura no relatório.
+
+#### N4 — nomes de teste que prometem mais do que as asserções verificam
+
+- **Severidade: Baixo | NÃO BLOQUEANTE | Destinatário: QA**
+- **Onde**: `:224-231` (`SC-004: valor permanece congelado sem recarga`) reproduz
+  **literalmente** as asserções de `:87` (P1) e `:92` (P2), sem acrescentar poder de
+  detecção; `:233-238` (`SC-003: valor é localizável rapidamente`) é um subconjunto da
+  asserção de `:66` (H8); `:128-145` verifica intervalos, não o fuso que o nome anuncia
+  (ver C1).
+- **Problema**: duplicação pura e títulos que superdimensionam a cobertura. Quem ler a saída
+  de `npm test` concluirá que `SC-003` e `SC-004` foram verificados como critérios, quando o
+  que existe é a checagem indireta de P1/P2/H8 — ambos já contados. A honestidade do nome do
+  teste é o que faz o relatório de execução ser confiável.
+- **Correção esperada**: renomear para o que de fato é verificado (por exemplo
+  `SC-004: nenhum mecanismo de atualização automática no HTML (via P1/P2)`) ou remover as
+  duplicatas, deixando a observação manual registrada apenas no `quickstart.md`.
+
+#### N5 — helper de subprocesso: sem listener de `error`, sem limite de tempo e com caminho interpolado no script
+
+- **Severidade: Sugestão | NÃO BLOQUEANTE | Destinatário: QA**
+- **Onde**: `:281-311`
+- **Problema**: (a) não há `child.on('error', reject)`; (b) não há limite de tempo para o
+  filho; (c) o caminho absoluto é interpolado dentro de uma literal de aspas simples no
+  script passado a `node -e` (`:287`), com escape manual apenas das barras invertidas.
+- **Impacto medido**: menor do que parece. O revisor reproduziu a forma do helper com um
+  executável inexistente: o `ENOENT` **não** pendura o runner — o `node:test` captura o
+  evento `error` não tratado como exceção não capturada e **reprova o teste** (medido). Resta
+  risco residual em dois cenários: um filho que nunca encerre travaria a suíte
+  indefinidamente (o `node:test` não impõe timeout padrão), e um caminho de projeto que
+  contenha `'` quebraria o script gerado — este repositório está hospedado em um caminho com
+  espaços, que já funciona, mas o escape é frágil por construção.
+- **Correção esperada**: acrescentar `child.on('error', reject)` e passar o caminho por
+  argumento em vez de interpolá-lo, por exemplo
+  `spawn(process.execPath, ['-e', 'const { formatarDataHora } = require(process.argv[1]); console.log(formatarDataHora(new Date(process.argv[2])));', caminhoDoApp, instante], { env })`
+  — o que também elimina a dependência de `node` estar no `PATH` (`process.execPath`).
+
+#### N6 — asserção negativa de cor cobre apenas hexadecimais de 6 dígitos em `<span>`
+
+- **Severidade: Sugestão | NÃO BLOQUEANTE | Destinatário: QA**
+- **Onde**: `:272` — `assert.doesNotMatch(res.text, /<span style="color: #(?!8b0000)[0-9a-f]{6}">/i)`
+- **Problema**: a regra §2.3 ("nada mais colorido na página") passaria com `color: red`,
+  `color: #f00` ou com cor aplicada a `<p>`/`<body>`. A asserção positiva de `:270` é exata
+  e suficiente para `SC-007`; a negativa só dá uma falsa sensação de completude.
+- **Correção esperada**: opcionalmente, trocar por uma contagem — nenhuma outra declaração
+  `color:` no documento além da do `<span>` do valor — ou simplesmente remover a asserção
+  negativa, mantendo a positiva.
+
+### D. Determinismo, isolamento e limpeza de recursos
+
+| Critério | Veredito |
+|---|---|
+| Porta fixa | Nenhuma. `supertest(app)` usa porta efêmera; `app.listen` continua sob `require.main === module`. Nenhum servidor permanece aberto |
+| Rede externa | Nenhuma chamada. Única dependência de ambiente: a configuração de rede local lida por `getIpAddress` (ver N1) |
+| Ordem de execução | Nenhum teste depende de outro. O único estado compartilhado (`htmlBody`) é morto (N2) |
+| Relógio real | Nenhum teste compara o valor renderizado com `new Date()` do próprio teste, logo **não há risco de intermitência na virada de segundo**. O problema é o oposto: a ausência dessa comparação é o que cria o falso-verde de C1. A espera de 1100 ms em `:250` é suficiente e não é fonte de instabilidade |
+| Fuso/locale do host | Os valores esperados são literais; os testes de subprocesso fixam `TZ` no ambiente do filho. Suíte verde sob `TZ` padrão, `UTC` e `Asia/Tokyo` (medido) |
+| Processos filhos | Quatro filhos (`node -e`), cada um encerra sozinho e é aguardado em `close`; `stdout`/`stderr` consumidos. Nenhum filho sobrevive à suíte. Ressalvas de robustez em N5 |
+| Encerramento do runner | `node --test` sai com código `0` sem *handle* pendurado; duração total ≈ 2,5 s |
+
+### E. Conformidade com a constituição (apenas o que esta rodada acrescenta)
+
+| Portão | Veredito |
+|---|---|
+| II — stack de testes `node:test` + `supertest` | Aprovado. Nenhum framework novo, nenhum *runner* alternativo, nenhum auxiliar de asserção externo; `node:assert/strict` em todo o arquivo |
+| I — política de dependências | Aprovado. `3010ad3` não toca `package.json` nem `package-lock.json`; `npm ls --depth=0` inalterado |
+| I — mudança mínima | Aprovado. Um único arquivo de teste novo, no diretório previsto (`test/aceite/`); nenhum código de produção alterado pelo QA |
+| II — teste para comportamento observável | **Reprovado nesta rodada** — `FR-001` e `FR-007` seguem sem verificação efetiva (C1) |
+| V — identificadores novos em português | **Reprovado nesta rodada** (C2) |
+| III — testes que fixam o fuso | Aprovado, e agora com poder de detecção real (R2 fechada, confirmada por mutação) |
+
+### F. Parecer da rodada complementar
+
+**Reprovado.** O arquivo de testes do QA é, na maior parte, de boa qualidade: as asserções
+de HTML são literais e exatas, os valores esperados são literais (não derivados da entrada),
+não há `try/catch` engolindo falha, não há teste vazio nem `assert` ausente — exceto no caso
+de C1 —, e as ressalvas R2 e R4 foram fechadas de forma verificável, com poder de detecção
+comprovado por mutação. Mas a suíte **passa por motivo errado** em dois requisitos que a
+rodada anterior já havia sinalizado como parciais: com o valor congelado no carregamento do
+módulo, ou mesmo com uma data fixa escrita no código, os 31 testes continuam verdes. Como o
+`qa-report.md` declara esses requisitos cobertos e zero defeitos, o PR seria aberto sobre
+uma afirmação de cobertura que a medição refuta.
+
+A correção é pequena (duas asserções, uma delas de uma linha) e foi validada pelo revisor
+contra os mutantes e contra a intermitência. Nenhuma alteração em código de produção é
+necessária: o `app.js` revisado na rodada anterior está correto nos dois mutantes testados —
+o defeito é exclusivamente de poder de detecção dos testes.
+
+#### Achados por severidade
+
+| ID | Severidade | Bloqueante | Resumo | Destinatário |
+|---|---|---|---|---|
+| C1 | **Crítico** | **Sim** | `FR-001` e `FR-007`/`SC-005` sem asserção: suíte verde com valor congelado (M1) e com data fixa no código (M2) | QA (E6) |
+| C2 | Alto (portão do Princípio V) | **Sim** | `htmlBody`, `scriptPath`, `child`, `match*`: identificadores novos em inglês | QA (E6) |
+| N1 | Médio | Não | Asserção de IPv4 falha em host sem interface externa (falso vermelho) | QA |
+| N2 | Baixo | Não | `htmlBody` morto + teste quase tautológico `obtém o HTML da página` | QA |
+| N3 | Baixo | Não | H2 (`<meta charset="UTF-8">`) sem teste, declarado coberto | QA |
+| N4 | Baixo | Não | Nomes de teste (`SC-003`, `SC-004`, "fuso America/Sao_Paulo") prometem mais do que verificam | QA |
+| N5 | Sugestão | Não | Helper de subprocesso sem `on('error')`, sem timeout, com caminho interpolado | QA |
+| N6 | Sugestão | Não | Asserção negativa de cor cobre só hex de 6 dígitos em `<span>` | QA |
+
+**Próxima etapa sugerida**: retorno a E6 (QA) para fechar C1 e C2; em seguida, nova
+verificação pontual destes dois itens antes de E7. Os achados N1–N6 podem ser endereçados na
+mesma passagem ou seguir para a descrição do PR como ressalvas.
