@@ -19,12 +19,12 @@ describe('Página inicial de informações do servidor (aceite)', () => {
   });
 
   describe('Contrato HTML — Elementos obrigatórios (§2.1)', () => {
-    let htmlBody;
+    let corpoHtml;
 
     test('obtém o HTML da página', async () => {
       const res = await supertest(app).get('/');
-      htmlBody = res.text;
-      assert.ok(htmlBody, 'HTML deve não estar vazio');
+      corpoHtml = res.text;
+      assert.ok(corpoHtml, 'HTML deve não estar vazio');
     });
 
     test('contém <html lang="pt-br"> (H1)', async () => {
@@ -115,9 +115,9 @@ describe('Página inicial de informações do servidor (aceite)', () => {
     test('valor está na máscara dd/mm/aaaa hh:mm:ss com exatamente 19 caracteres (FR-003, FR-004, SC-001)', async () => {
       const res = await supertest(app).get('/');
       // Extrai o valor do <span style="color: #8b0000">...</span>
-      const match = res.text.match(/<span style="color: #8b0000">([^<]+)<\/span>/);
-      assert.ok(match, 'Deve encontrar o valor dentro do <span>');
-      const valor = match[1];
+      const correspondencia = res.text.match(/<span style="color: #8b0000">([^<]+)<\/span>/);
+      assert.ok(correspondencia, 'Deve encontrar o valor dentro do <span>');
+      const valor = correspondencia[1];
 
       // Validar regex
       assert.match(valor, /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/);
@@ -127,8 +127,8 @@ describe('Página inicial de informações do servidor (aceite)', () => {
 
     test('valor é uma data válida no fuso America/Sao_Paulo (FR-001, FR-002, SC-002)', async () => {
       const res = await supertest(app).get('/');
-      const match = res.text.match(/<span style="color: #8b0000">([^<]+)<\/span>/);
-      const valor = match[1];
+      const correspondencia = res.text.match(/<span style="color: #8b0000">([^<]+)<\/span>/);
+      const valor = correspondencia[1];
 
       // Extrai dia, mês, ano, hora, minuto, segundo
       const [dataParte, horaParte] = valor.split(' ');
@@ -146,8 +146,8 @@ describe('Página inicial de informações do servidor (aceite)', () => {
 
     test('valor não contém AM/PM (relógio de 24 horas) (FR-003)', async () => {
       const res = await supertest(app).get('/');
-      const match = res.text.match(/<span style="color: #8b0000">([^<]+)<\/span>/);
-      const valor = match[1];
+      const correspondencia = res.text.match(/<span style="color: #8b0000">([^<]+)<\/span>/);
+      const valor = correspondencia[1];
 
       assert.doesNotMatch(valor, /AM|PM|am|pm/);
     });
@@ -158,11 +158,11 @@ describe('Página inicial de informações do servidor (aceite)', () => {
       const res1 = await supertest(app).get('/');
       const res2 = await supertest(app).get('/');
 
-      const match1 = res1.text.match(/<span style="color: #8b0000">([^<]+)<\/span>/);
-      const match2 = res2.text.match(/<span style="color: #8b0000">([^<]+)<\/span>/);
+      const correspondencia1 = res1.text.match(/<span style="color: #8b0000">([^<]+)<\/span>/);
+      const correspondencia2 = res2.text.match(/<span style="color: #8b0000">([^<]+)<\/span>/);
 
-      const valor1 = match1[1];
-      const valor2 = match2[1];
+      const valor1 = correspondencia1[1];
+      const valor2 = correspondencia2[1];
 
       // Ambos devem estar na máscara
       assert.match(valor1, /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/);
@@ -239,27 +239,52 @@ describe('Página inicial de informações do servidor (aceite)', () => {
 
     test('SC-005: dois carregamentos distantes apresentam valores diferentes (FR-007)', async () => {
       // Duas requisições em instantes diferentes devem ter valores diferentes.
-      // Este teste é probabilístico: se rodado imediatamente, pode devolver o mesmo
-      // segundo. Aceitamos isso; o ponto é validar que a segunda requisição *pode*
-      // devolver um valor diferente (não está congelado na primeira).
+      // Com intervalo > 1 s, a mudança de segundo é garantida, não probabilística.
       const res1 = await supertest(app).get('/');
-      const match1 = res1.text.match(/<span style="color: #8b0000">([^<]+)<\/span>/);
-      const valor1 = match1[1];
+      const correspondencia1 = res1.text.match(/<span style="color: #8b0000">([^<]+)<\/span>/);
+      const valor1 = correspondencia1[1];
 
       // Aguarda 1.1s para garantir mudança de segundo (a precisão é até segundo).
       await new Promise((resolve) => setTimeout(resolve, 1100));
 
       const res2 = await supertest(app).get('/');
-      const match2 = res2.text.match(/<span style="color: #8b0000">([^<]+)<\/span>/);
-      const valor2 = match2[1];
+      const correspondencia2 = res2.text.match(/<span style="color: #8b0000">([^<]+)<\/span>/);
+      const valor2 = correspondencia2[1];
 
-      // Ambos devem ser válidos (já validado em outros testes).
+      // Ambos devem ser válidos
       assert.match(valor1, /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/);
       assert.match(valor2, /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/);
 
-      // Esperamos que valores em instantes distantes sejam diferentes.
-      // Se forem iguais, significa que caíram no mesmo segundo (raro, mas aceitável).
-      // A validação real é: cada um é válido e independente, não há cache global.
+      // Com intervalo > 1 s, o campo de segundos muda obrigatoriamente
+      assert.notEqual(valor1, valor2, 'o valor deve mudar entre requisições separadas por mais de 1 s');
+    });
+
+    test('o valor renderizado corresponde ao instante da requisição (FR-001)', async () => {
+      // O valor retornado deve estar dentro de uma janela de tempo ao redor da requisição,
+      // validando que o servidor lê de fato o relógio no momento da requisição,
+      // não usa um valor congelado no carregamento do módulo ou fixo no código.
+      //
+      // Estratégia: capturar antes e depois da requisição, gerar todos os valores possíveis
+      // em uma janela, e verificar que o valor retornado cai nela.
+      const antes = Date.now();
+      const res = await supertest(app).get('/');
+      const depois = Date.now();
+
+      const correspondencia = res.text.match(/<span style="color: #8b0000">([^<]+)<\/span>/);
+      assert.ok(correspondencia, 'Deve encontrar o valor dentro do <span>');
+      const valor = correspondencia[1];
+
+      // Gera todos os possíveis valores em uma janela de ±1000ms ao redor da requisição
+      // em passos de 200ms (garantir cobertura da mudança de segundo)
+      const valoresAceitos = new Set();
+      for (let t = antes - 1000; t <= depois + 1000; t += 200) {
+        valoresAceitos.add(formatarDataHora(new Date(t)));
+      }
+
+      assert.ok(
+        valoresAceitos.has(valor),
+        `valor ${valor} está fora da janela de tolerância da requisição`
+      );
     });
   });
 
@@ -280,11 +305,11 @@ describe('Página inicial de informações do servidor (aceite)', () => {
  */
 function executarEmSubprocessoComFuso(fuso, instante) {
   return new Promise((resolve, reject) => {
-    const scriptPath = path.join(__dirname, '../../app.js');
+    const caminhoDoScript = path.join(__dirname, '../../app.js');
     const env = { ...process.env, TZ: fuso };
 
-    const child = spawn('node', ['-e', `
-      const { formatarDataHora } = require('${scriptPath.replace(/\\/g, '\\\\')}');
+    const processoFilho = spawn('node', ['-e', `
+      const { formatarDataHora } = require('${caminhoDoScript.replace(/\\/g, '\\\\')}');
       const resultado = formatarDataHora(new Date('${instante}'));
       console.log(resultado);
     `], { env });
@@ -292,15 +317,15 @@ function executarEmSubprocessoComFuso(fuso, instante) {
     let stdout = '';
     let stderr = '';
 
-    child.stdout.on('data', (data) => {
+    processoFilho.stdout.on('data', (data) => {
       stdout += data.toString();
     });
 
-    child.stderr.on('data', (data) => {
+    processoFilho.stderr.on('data', (data) => {
       stderr += data.toString();
     });
 
-    child.on('close', (code) => {
+    processoFilho.on('close', (code) => {
       if (code !== 0) {
         reject(new Error(`Subprocess falhou com código ${code}: ${stderr}`));
       } else {
