@@ -56,9 +56,19 @@
       "status": "aprovado",
       "devolucoes": 0,
       "notas": "speckit-analyze executado pelo orquestrador (somente leitura). 0 achados CRITICAL. Cobertura por tarefa 11/16 (69%). Achados nao bloqueantes, a levar para a descricao do PR: C1 MEDIUM - FR-006, FR-008, FR-009, FR-010 e SC-009 sem tarefa, cobertura deliberadamente atribuida ao QA em test/aceite/ (exigir no handoff de E6 as assercoes de contracts/pagina-inicial.md secao 2); C2 LOW - SC-003, SC-004 e SC-005 so com verificacao manual do quickstart, exigir evidencia no qa-report.md; F1 LOW - deriva de rotulo de etapa, plan.md chama os testes de aceite do QA de E5 enquanto no fluxo da fabrica QA e E6; F2 LOW - T007 declara dependencia de T003 mas precisa do module.exports de T005, resolvido pelo portao da Fase 2. Medicao propria do orquestrador: 'node --test' sem nenhum arquivo de teste sai com codigo 0 (tests 0), caso ausente das medicoes de research.md D6, portanto o portao apos a fase de Setup nao falha por ausencia de testes"
+    },
+    "E4": {
+      "status": "em andamento",
+      "devolucoes": 0,
+      "fases_concluidas": [
+        "Fase 1 Setup (T001)"
+      ],
+      "notas": "Fase 1 Setup concluida. Verificado no disco: package.json sem moment e sem os, com supertest ^7.3.2 em devDependencies, script test = node --test, express e ejs preservados; package-lock.json regravado no mesmo passo; app.js e views/index.ejs intocados; T001 marcado [X] em tasks.md. Portao executado por mim: npm test saiu com codigo 0 (tests 0, sem arquivos de teste ainda, conforme medido em E3.5)"
     }
   },
-  "tasks_done": [],
+  "tasks_done": [
+    "T001"
+  ],
   "blockers": [
     "Projeto sem suite de testes em funcionamento: script test de package.json termina com erro; a criacao da verificacao automatizada integra esta entrega (Principio II da constituicao)",
     ".specify/extensions.yml ausente: nenhum hook git do Spec Kit registrado; branch e commits sao feitos pelo orquestrador",
@@ -75,5 +85,5 @@
       "status": "pendente"
     }
   },
-  "updated_at": "2026-11-23T00:45:00-03:00"
+  "updated_at": "2026-11-23T01:00:00-03:00"
 }
