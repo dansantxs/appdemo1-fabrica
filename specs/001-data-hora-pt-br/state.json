@@ -9,8 +9,8 @@
     "lint": null,
     "build": null
   },
-  "last_reviewed_commit": null,
-  "stage": "REVISANDO",
+  "last_reviewed_commit": "7b90d325c1de7a57c918cb76d2db19798387187e",
+  "stage": "TESTANDO",
   "artifacts": {
     "specs/001-data-hora-pt-br/spec.md": "E1 (speckit-specify)",
     "specs/001-data-hora-pt-br/checklists/requirements.md": "E1 (speckit-specify)",
@@ -20,7 +20,8 @@
     "specs/001-data-hora-pt-br/research.md": "E2 (speckit-plan)",
     "specs/001-data-hora-pt-br/data-model.md": "E2 (speckit-plan)",
     "specs/001-data-hora-pt-br/contracts/pagina-inicial.md": "E2 (speckit-plan)",
-    "specs/001-data-hora-pt-br/quickstart.md": "E2 (speckit-plan)"
+    "specs/001-data-hora-pt-br/quickstart.md": "E2 (speckit-plan)",
+    "specs/001-data-hora-pt-br/review-report.md": "E5 (Revisor de Codigo)"
   },
   "gates": {
     "E0": {
@@ -73,6 +74,13 @@
         "Desenvolvedor (Fase 2): antecipou a troca de uma linha do handler de GET / para formatarDataHora(new Date()), conteudo de T006, porque remover o require(moment) em T002 deixaria a rota quebrando em tempo de execucao (ReferenceError) sem teste para capturar, ja que T007 so chega na Fase 3. Decisao aceita pelo orquestrador: evita estado deliberadamente quebrado e nao antecipa nenhuma outra tarefa. T006 permanece desmarcada e sera confirmada na Fase 3",
         "Desenvolvedor (Fase 3): uso de describe/test do node:test para agrupar os casos sob o nome da funcao, decisao de estilo, sem efeito sobre API ou contrato"
       ]
+    },
+    "E5": {
+      "status": "aprovado",
+      "devolucoes": 0,
+      "parecer": "aprovado com ressalvas",
+      "intervalo_revisado": "main...HEAD",
+      "notas": "review-report.md presente no disco, nenhum achado bloqueante. npm test medido pelo Revisor: 8 tests, 8 pass, 0 fail, exit 0. Ressalvas nao bloqueantes para a descricao do PR: R1 Alto - HTML/HTTP observavel sem teste neste diff (FR-005, FR-008, FR-009, FR-010, SC-007, SC-008, SC-009 sem verificacao; FR-001, FR-006, FR-007 parciais), destinatario QA em E6; R2 Medio - o teste de invariancia de fuso muta process.env.TZ em tempo de execucao depois que o Intl.DateTimeFormat ja foi construido, e um Intl ja construido nao reassocia o fuso, logo o teste nao pegaria a regressao de esquecer o timeZone num host cujo fuso ja e America/Sao_Paulo; a prova real e rodar a suite com TZ no ambiente (feito em T010, mas nao codificado); recomendacao: somar um teste com child_process e env TZ; R3 Baixo - app.js linha 24 usa partes.find(...).value sem guarda, caminho inalcancavel, sem acao recomendada para nao contrariar o Principio I; R4 Baixo - horario de verao eventual sem par de referencia, comportamento medido como correto (2018-01-15T02:30:00Z = 15/01/2018 00:30:00); R5 Sugestao - process.env.PORT || 3000 descarta PORT=0, nenhum requisito afetado; R6 Sugestao - a justificativa (a)/(b) do supertest precisa constar do corpo do PR, exigencia do Principio I"
     }
   },
   "tasks_done": [
@@ -103,5 +111,5 @@
       "status": "pendente"
     }
   },
-  "updated_at": "2026-11-23T02:00:00-03:00"
+  "updated_at": "2026-11-23T02:15:00-03:00"
 }
