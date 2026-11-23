@@ -58,4 +58,23 @@ describe('formatarDataHora', () => {
       }
     }
   });
+
+  test('devolve a mesma saída em duas chamadas com o mesmo instante (sem cache variando o resultado)', () => {
+    const instante = new Date('2026-07-03T12:05:07Z');
+
+    const primeiraChamada = formatarDataHora(instante);
+    const segundaChamada = formatarDataHora(instante);
+
+    assert.equal(primeiraChamada, segundaChamada);
+  });
+
+  test('devolve saídas diferentes para instantes diferentes (não memoriza nem lê relógio interno)', () => {
+    const primeiroInstante = new Date('2026-07-03T12:05:07Z');
+    const segundoInstante = new Date('2026-11-24T03:30:04Z');
+
+    const resultadoPrimeiro = formatarDataHora(primeiroInstante);
+    const resultadoSegundo = formatarDataHora(segundoInstante);
+
+    assert.notEqual(resultadoPrimeiro, resultadoSegundo);
+  });
 });

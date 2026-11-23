@@ -73,7 +73,7 @@ Projeto único, sem `src/`: `app.js` e `views/index.ejs` na raiz, conforme `plan
 
 ### Implementation for User Story 2
 
-- [ ] T008 [US2] Em `views/index.ejs`, envolver apenas `<%= horaAtual %>` em `<span style="color: #8b0000">...</span>`, mantendo o texto `Hora Atual do Servidor:` fora do `<span>` (`FR-005`; `contracts/pagina-inicial.md` §2.1 H7/H8 e §2.3 — fragmento de referência; research.md D4 — `#8b0000` sobre `#ffffff` mede 10,01:1, acima do mínimo de 4,5:1 de `SC-007`). Não alterar nenhuma outra linha do template (preserva `FR-009`). Depende da Foundational concluída (T005); não depende de T006/T007 porque o template já referencia a variável `horaAtual` existente, apenas inalterada em nome.
+- [X] T008 [US2] Em `views/index.ejs`, envolver apenas `<%= horaAtual %>` em `<span style="color: #8b0000">...</span>`, mantendo o texto `Hora Atual do Servidor:` fora do `<span>` (`FR-005`; `contracts/pagina-inicial.md` §2.1 H7/H8 e §2.3 — fragmento de referência; research.md D4 — `#8b0000` sobre `#ffffff` mede 10,01:1, acima do mínimo de 4,5:1 de `SC-007`). Não alterar nenhuma outra linha do template (preserva `FR-009`). Depende da Foundational concluída (T005); não depende de T006/T007 porque o template já referencia a variável `horaAtual` existente, apenas inalterada em nome.
 
 **Checkpoint**: a página destaca somente o valor da data/hora, sem afetar o rótulo nem o restante do conteúdo. US1 e US2 funcionam juntos e permanecem testáveis de forma independente.
 
@@ -87,7 +87,7 @@ Projeto único, sem `src/`: `app.js` e `views/index.ejs` na raiz, conforme `plan
 
 ### Implementation for User Story 3
 
-- [ ] T009 [US3] Em `test/unidade/data-hora.test.js`, adicionar um teste que chama `formatarDataHora` duas vezes com o **mesmo** instante e confere que a saída é idêntica nas duas chamadas (sem cache fazendo a saída variar), e outro que chama com **dois instantes diferentes** e confere que as saídas diferem — comprovando que a função não memoriza nem lê relógio interno, apenas o parâmetro recebido (`contracts/pagina-inicial.md` §4 — "não lê o relógio, não tem efeito colateral"). Sustenta `FR-006` (valor não se move por conta própria) e `FR-007`/`SC-005` (novo valor por chamada, logo por requisição, já que T006 chama `formatarDataHora(new Date())` a cada `GET /`; `data-model.md`, seção *Ciclo de vida* — "sem cache: duas requisições próximas podem produzir valores iguais ou diferentes, e ambos são válidos"). Depende de T007 (mesmo arquivo `test/unidade/data-hora.test.js`, sequencial).
+- [X] T009 [US3] Em `test/unidade/data-hora.test.js`, adicionar um teste que chama `formatarDataHora` duas vezes com o **mesmo** instante e confere que a saída é idêntica nas duas chamadas (sem cache fazendo a saída variar), e outro que chama com **dois instantes diferentes** e confere que as saídas diferem — comprovando que a função não memoriza nem lê relógio interno, apenas o parâmetro recebido (`contracts/pagina-inicial.md` §4 — "não lê o relógio, não tem efeito colateral"). Sustenta `FR-006` (valor não se move por conta própria) e `FR-007`/`SC-005` (novo valor por chamada, logo por requisição, já que T006 chama `formatarDataHora(new Date())` a cada `GET /`; `data-model.md`, seção *Ciclo de vida* — "sem cache: duas requisições próximas podem produzir valores iguais ou diferentes, e ambos são válidos"). Depende de T007 (mesmo arquivo `test/unidade/data-hora.test.js`, sequencial).
 
 **Checkpoint**: todas as três histórias de usuário estão implementadas e cobertas por teste unitário onde aplicável. `npm test` sai com `0`.
 
