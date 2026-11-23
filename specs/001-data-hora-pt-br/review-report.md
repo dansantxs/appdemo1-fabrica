@@ -634,3 +634,132 @@ o defeito é exclusivamente de poder de detecção dos testes.
 **Próxima etapa sugerida**: retorno a E6 (QA) para fechar C1 e C2; em seguida, nova
 verificação pontual destes dois itens antes de E7. Os achados N1–N6 podem ser endereçados na
 mesma passagem ou seguir para a descrição do PR como ressalvas.
+
+---
+
+## Verificação da rodada 2 — fechamento de C1 e C2
+
+**Data**: 2026-11-23 | **Revisor**: Revisor de Código (Fábrica de Software) |
+**Escopo**: exclusivamente C1 e C2. Diff inspecionado:
+`20a48cf..HEAD -- test/aceite/pagina-inicial.test.js specs/001-data-hora-pt-br/qa-report.md`
+(commit da correção `cd8472a`). Código de produção, R3, R5, R6 e N2–N6 **não** reabertos.
+
+**PARECER desta verificação: aprovado com ressalvas** — **C1 e C2 fechados**, nenhum
+bloqueante remanescente.
+
+### A. Medições do revisor
+
+| Verificação | Resultado medido |
+|---|---|
+| `npm test` | **40 testes, 40 aprovados, 0 falhas, 12 suítes; código de saída `0`** |
+| Estabilidade: 5 execuções consecutivas | 40/40 em todas; **zero intermitência** |
+| `TZ=UTC`, `TZ=Asia/Tokyo`, `TZ=America/Los_Angeles`, `TZ=Pacific/Kiritimati` | 40/40 em todas |
+| Arquivos no diff `20a48cf..HEAD` | apenas `test/aceite/pagina-inicial.test.js` e `qa-report.md` — **nenhum arquivo de produção** |
+| `app.js`, `views/index.ejs`, `package.json`, `package-lock.json`, `test/unidade/` | `git diff aeb2bee..HEAD` **vazio** — intocados desde a revisão de código |
+| Inventário de nomes de teste, antes × depois | 31 → 32; **nenhum teste removido**, nenhuma asserção enfraquecida; único acréscimo: `o valor renderizado corresponde ao instante da requisição (FR-001)` |
+
+Ambiente: Node v24.20.0, fuso do host `America/Sao_Paulo`. Árvore limpa ao fim; nenhum
+arquivo alterado por esta verificação além deste relatório.
+
+### B. C1 — reprodução da mutação pelo revisor — **FECHADO**
+
+Mesma metodologia da rodada anterior: cópia isolada do projeto fora do repositório, com
+`NODE_PATH` apontando para o `node_modules` do projeto; suíte do QA executada **sem
+alteração** contra cada mutante. Controle na cópia isolada sem mutação: 40/40, código `0`.
+
+| Mutante | Antes (rodada 1) | Agora | Testes que falham |
+|---|---|---|---|
+| **M1** — valor calculado uma única vez no carregamento do módulo (congelado) | 31/31 aprovados (falso-verde) | **38 aprovados / 2 falhas** | `SC-005: dois carregamentos distantes apresentam valores diferentes (FR-007)` e `o valor renderizado corresponde ao instante da requisição (FR-001)` |
+| **M2** — `const horaAtual = '01/01/2000 00:00:00'` | 31/31 aprovados (falso-verde) | **38 aprovados / 2 falhas** | os mesmos dois testes |
+| **M3** — remoção de `timeZone: 'America/Sao_Paulo'` (controle de regressão da R2) | 28/31 | **37 aprovados / 3 falhas** | os 3 testes de subprocesso (`UTC`, `Asia/Tokyo`, `America/Los_Angeles`) |
+
+Cada mutante foi executado duas vezes, com resultado idêntico. O relato do QA ("2 falhas por
+mutante") **confere com a medição**. M3 confirma que o poder de detecção da R2 não foi
+enfraquecido pela refatoração de nomes.
+
+**Atribuição do abate (medida em isolamento, um teste por vez):**
+
+| Teste isolado | M1 | M2 |
+|---|---|---|
+| `SC-005` (`assert.notEqual`, `:259`) | **falha** | **falha** |
+| `FR-001` (janela de tolerância, `:262-288`) | **passa** | **falha** |
+
+Ou seja: **o abate de M1 é garantido pelo `assert.notEqual` de `SC-005`**, que é
+determinístico (espera de 1100 ms > 1 s obriga a mudança do campo de segundos). O teste de
+janela também reprova M1 na suíte completa, mas só porque até ele chegar já se passaram
+≈ 2 s desde o carregamento do módulo — executado sozinho, imediatamente após o `require`,
+ele **passa** contra M1, pois o valor congelado ainda cai dentro da janela de ±1000 ms. Isso
+não reabre C1 (há killer determinístico), mas é a ressalva **N7** abaixo.
+
+### C. Robustez do teste novo de janela de tolerância
+
+| Critério | Veredito |
+|---|---|
+| Margem contra a virada de segundo | **Suficiente**. A janela vai de `antes − 1000 ms` a `depois + 1000 ms`, com passo de 200 ms: todo segundo contido na janela é amostrado (200 ms < 1 s), e a folga de 1 s em cada lado cobre as bordas. Não há como o valor correto cair fora. |
+| Intermitência observada | **Nenhuma** em 9 execuções da suíte (5 no fuso padrão + 4 em fusos distintos), todas 40/40 |
+| Risco de passar por acidente | **Baixo e limitado**. A janela aceita ≈ 3 s de valores, logo o teste não detectaria um atraso ou cache de até ~1 s — tolerância deliberada e adequada a `FR-001`. Rejeita qualquer valor fora dela (M2 é reprovado de forma determinística). |
+| Uso de `formatarDataHora` como oráculo | **Legítimo**, como a correção esperada previa: o teste decide apenas *quando*, não *como*; máscara e fuso continuam fixados de forma independente pelos pares de referência e pelos testes de subprocesso (M3 ainda é abatido). |
+| Custo | ≈ 6 ms; 11–13 iterações de laço |
+
+### D. C2 — identificadores em português — **FECHADO**
+
+Varredura de todas as declarações (`const`/`let`/`var`/`function`/parâmetros) do arquivo:
+
+- Renomeações confirmadas: `htmlBody` → `corpoHtml` (`:22, 26, 27`); `match`/`match1`/`match2`
+  → `correspondencia`/`correspondencia1`/`correspondencia2` (`:118, 120, 130, 131, 149, 150,
+  161-165, 244, 245, 251, 252, 273, 275`); `scriptPath` → `caminhoDoScript` (`:308, 312`);
+  `child` → `processoFilho` (`:311, 320, 324, 328`).
+- Identificadores novos do teste acrescentado também em português: `antes`, `depois`,
+  `valoresAceitos`, `correspondencia`, `valor`.
+- Nenhum identificador novo em inglês restante. As ocorrências de `match` que permanecem são
+  **API do Node/JS** (`assert.match`, `assert.doesNotMatch`, `String.prototype.match`) — não
+  são identificadores e, como já registrado em C2, não são achado.
+- Os demais nomes em inglês são exatamente os isentados em C2 por serem consagrados ou
+  impostos por API externa: `res`, `res1`, `res2`, `env`, `code`, `data`, `resolve`,
+  `reject`, `stdout`, `stderr`, `app`, `test`, `describe`, `assert`, `supertest`, `path`,
+  `spawn`.
+- Adequação ao domínio: os quatro nomes novos são precisos e consistentes com o restante do
+  arquivo. `caminhoDoScript` mantém "script", termo técnico consagrado em pt-BR, dentro da
+  exceção prevista pelo Princípio V.
+
+Portão **V — identificadores novos em português: aprovado**.
+
+### E. Integridade da correção
+
+Nenhum arquivo de produção foi alterado nesta rodada e nenhum teste anterior foi removido,
+renomeado ou enfraquecido para fazer a suíte passar. O diff do arquivo de teste é
+exclusivamente: (i) renomeações puras; (ii) substituição do comentário que justificava a
+omissão da comparação; (iii) a asserção `assert.notEqual` em `SC-005`; (iv) o teste novo de
+`FR-001`. A única asserção tocada em teste preexistente **aumentou** o rigor.
+
+### F. Fidelidade do `qa-report.md`
+
+O relatório corrigido **passou a descrever a realidade nos pontos essenciais**: registra C1
+como defeito da rodada de revisão (§9, "Defeito de teste, não de código de produção",
+severidade Crítico, com passos de reprodução e resultado pós-correção), corrige as contagens
+para 32 de aceite / 40 totais, descreve as duas correções de C1 e as quatro renomeações de
+C2, e reporta "M1 e M2 falham 2/40" — número que esta verificação confirma. Restam
+passagens **desatualizadas**, não bloqueantes (ressalva **N8**).
+
+### G. Achados desta verificação
+
+| ID | Severidade | Bloqueante | Resumo | Destinatário |
+|---|---|---|---|---|
+| N7 | Baixo | Não | O abate de M1 pelo teste de janela depende do tempo decorrido na suíte (isolado, ele passa contra M1). O killer determinístico de M1 é o `assert.notEqual` de `SC-005`: se ele for removido ou a ordem mudar, a detecção de "valor congelado no carregamento" fica frágil. Correção opcional: comparar o valor com `formatarDataHora(new Date(antes))` exigindo diferença quando a janela do módulo já passou, ou simplesmente registrar no arquivo que `SC-005` é o guardião de M1. | QA / descrição do PR |
+| N8 | Baixo | Não | `qa-report.md` com passagens desatualizadas: §7 (SC-005) ainda afirma que o teste "valida que cada uma retorna um valor válido… se caíram no mesmo segundo, ambos são válidos", contradizendo o `assert.notEqual` agora presente; o Apêndice "Teste SC-005" (§final) reproduz o código **anterior**, sem a comparação; o Apêndice "Teste R2" exibe `child` e `scriptPath`, nomes já renomeados; §6/R1 ainda diz "31 testes"; §2 (SC-006) cita três fusos enquanto §4-R2 e §11 citam dois; §11 contém "all 11 checks passed" em inglês. | QA / descrição do PR |
+
+Os achados **N1–N6** da rodada anterior permanecem abertos e **não bloqueantes**, com a
+classificação já publicada (N1 em especial: `:49` continua exigindo IPv4 e falharia em host
+sem interface externa).
+
+### H. Parecer da verificação
+
+**Aprovado com ressalvas.** Os dois achados bloqueantes estão fechados de forma verificável:
+C1 por medição direta de mutação feita pelo revisor — a suíte corrigida **mata M1 e M2**, com
+2 falhas cada, e conserva o abate de M3 —, e C2 por varredura completa de identificadores. A
+correção não introduziu intermitência (9 execuções, 4 fusos, zero falhas), não tocou código
+de produção e não enfraqueceu nenhum teste anterior. Restam apenas ressalvas Baixas e de
+Sugestão (N1–N8), todas destinadas à descrição do PR.
+
+**Próxima etapa sugerida**: E7 (abertura do PR), levando N1–N8 e R3, R5, R6 como ressalvas
+na descrição. Nenhuma devolução ao QA é necessária.

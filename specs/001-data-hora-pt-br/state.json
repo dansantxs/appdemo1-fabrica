@@ -10,7 +10,7 @@
     "build": null
   },
   "last_reviewed_commit": "7b90d325c1de7a57c918cb76d2db19798387187e",
-  "stage": "TESTANDO",
+  "stage": "PUBLICANDO_PR",
   "artifacts": {
     "specs/001-data-hora-pt-br/spec.md": "E1 (speckit-specify)",
     "specs/001-data-hora-pt-br/checklists/requirements.md": "E1 (speckit-specify)",
@@ -85,17 +85,17 @@
       "notas": "review-report.md presente no disco, nenhum achado bloqueante. npm test medido pelo Revisor: 8 tests, 8 pass, 0 fail, exit 0. Ressalvas nao bloqueantes para a descricao do PR: R1 Alto - HTML/HTTP observavel sem teste neste diff (FR-005, FR-008, FR-009, FR-010, SC-007, SC-008, SC-009 sem verificacao; FR-001, FR-006, FR-007 parciais), destinatario QA em E6; R2 Medio - o teste de invariancia de fuso muta process.env.TZ em tempo de execucao depois que o Intl.DateTimeFormat ja foi construido, e um Intl ja construido nao reassocia o fuso, logo o teste nao pegaria a regressao de esquecer o timeZone num host cujo fuso ja e America/Sao_Paulo; a prova real e rodar a suite com TZ no ambiente (feito em T010, mas nao codificado); recomendacao: somar um teste com child_process e env TZ; R3 Baixo - app.js linha 24 usa partes.find(...).value sem guarda, caminho inalcancavel, sem acao recomendada para nao contrariar o Principio I; R4 Baixo - horario de verao eventual sem par de referencia, comportamento medido como correto (2018-01-15T02:30:00Z = 15/01/2018 00:30:00); R5 Sugestao - process.env.PORT || 3000 descarta PORT=0, nenhum requisito afetado; R6 Sugestao - a justificativa (a)/(b) do supertest precisa constar do corpo do PR, exigencia do Principio I"
     },
     "E6": {
-      "status": "em correcao",
+      "status": "aprovado",
       "devolucoes": 1,
-      "parecer": "aprovado pelo QA, porem reprovado na revisao dos testes (C1 Critico)",
-      "notas": "qa-report.md e test/aceite/pagina-inicial.test.js presentes no disco. 31 testes de aceite criados pelo QA, somados aos 8 unitarios: suite com 39 testes. Portoes executados por mim: npm test = 39 tests, 39 pass, 0 fail, exit 0; TZ=UTC exit 0; TZ=Asia/Tokyo exit 0. Zero defeitos (0 criticos, 0 altos, 0 medios, 0 baixos). Ressalvas do Revisor fechadas: R1 coberta pelos testes de HTML/HTTP (status 200, Content-Type, elementos obrigatorios H1-H9, proibicoes P1-P5, mascara, destaque, rotulo, ausencia de script/refresh); R2 fechada com testes que carregam app.js em processo filho sob TZ UTC, America/Sao_Paulo, Asia/Tokyo e America/Los_Angeles, provando a independencia real de fuso; R4 coberta por caso historico de horario de verao (2018-01-15 com offset -02:00). Nenhum arquivo de producao foi alterado pelo QA"
+      "parecer": "aprovado",
+      "notas": "qa-report.md e test/aceite/pagina-inicial.test.js presentes no disco. 31 testes de aceite criados pelo QA, somados aos 8 unitarios: suite com 39 testes. Portoes executados por mim: npm test = 39 tests, 39 pass, 0 fail, exit 0; TZ=UTC exit 0; TZ=Asia/Tokyo exit 0. Zero defeitos (0 criticos, 0 altos, 0 medios, 0 baixos). Ressalvas do Revisor fechadas: R1 coberta pelos testes de HTML/HTTP (status 200, Content-Type, elementos obrigatorios H1-H9, proibicoes P1-P5, mascara, destaque, rotulo, ausencia de script/refresh); R2 fechada com testes que carregam app.js em processo filho sob TZ UTC, America/Sao_Paulo, Asia/Tokyo e America/Los_Angeles, provando a independencia real de fuso; R4 coberta por caso historico de horario de verao (2018-01-15 com offset -02:00). Nenhum arquivo de producao foi alterado pelo QA | RODADA 2 APROVADA: C1 fechado com assert.notEqual efetivo em SC-005 e teste novo de janela de tolerancia usando formatarDataHora como oraculo (FR-001); C2 fechado com os identificadores renomeados para portugues; qa-report.md corrigido para registrar C1 como defeito de teste da rodada de revisao. Portao final executado por mim: npm test = 40 tests, 40 pass, 0 fail, exit 0"
     },
     "E5b": {
-      "status": "reprovado",
+      "status": "aprovado",
       "devolucoes": 0,
-      "parecer": "reprovado",
+      "parecer": "aprovado com ressalvas (rodada 2)",
       "escopo": "somente test/aceite/pagina-inicial.test.js, testes criados pelo QA em E6",
-      "notas": "Revisao complementar dos testes do QA. Achados bloqueantes devolvidos ao QA: C1 Critico - FR-001 e FR-007/SC-005 sem assercao que os verifique; o Revisor provou por mutacao do codigo de producao em copia isolada que a suite do QA passa 31/31 com o valor congelado no carregamento do modulo e tambem com a data fixa 01/01/2000 00:00:00; as linhas 240-263 capturam valor1 e valor2, esperam 1100 ms e nunca os comparam, e o comentario justifica a omissao como probabilistica, o que e falso com intervalo maior que 1 s; o qa-report.md declara esses requisitos cobertos e zero defeitos, precisa ser corrigido. C2 Alto, portao do Principio V - identificadores novos em ingles no teste (htmlBody, scriptPath, child, match). Ressalvas anteriores: R2 fechada (o mutante sem timeZone quebra a suite), R4 fechada, R1 parcialmente fechada (faltam justamente FR-001 e FR-007). Nao bloqueantes N1 a N6 registrados no review-report.md, com destaque para N1: a assercao de IPv4 falha em host sem interface externa, falso vermelho"
+      "notas": "Revisao complementar dos testes do QA. Achados bloqueantes devolvidos ao QA: C1 Critico - FR-001 e FR-007/SC-005 sem assercao que os verifique; o Revisor provou por mutacao do codigo de producao em copia isolada que a suite do QA passa 31/31 com o valor congelado no carregamento do modulo e tambem com a data fixa 01/01/2000 00:00:00; as linhas 240-263 capturam valor1 e valor2, esperam 1100 ms e nunca os comparam, e o comentario justifica a omissao como probabilistica, o que e falso com intervalo maior que 1 s; o qa-report.md declara esses requisitos cobertos e zero defeitos, precisa ser corrigido. C2 Alto, portao do Principio V - identificadores novos em ingles no teste (htmlBody, scriptPath, child, match). Ressalvas anteriores: R2 fechada (o mutante sem timeZone quebra a suite), R4 fechada, R1 parcialmente fechada (faltam justamente FR-001 e FR-007). Nao bloqueantes N1 a N6 registrados no review-report.md, com destaque para N1: a assercao de IPv4 falha em host sem interface externa, falso vermelho | RODADA 2: C1 e C2 FECHADOS, confirmados por mutacao reproduzida pelo proprio Revisor em copia isolada (controle 40/40 exit 0): M1 valor congelado -> 38 pass / 2 fail; M2 data fixa 01/01/2000 -> 38 pass / 2 fail; M3 remocao do timeZone -> 37 pass / 3 fail; cada mutante rodado 2x com resultado identico. Estabilidade: 9 execucoes 40/40, incluindo TZ=UTC, Asia/Tokyo, America/Los_Angeles e Pacific/Kiritimati. Integridade confirmada: nenhum arquivo de producao alterado na rodada, nenhum teste removido ou enfraquecido (31 -> 32 testes de aceite). Novas ressalvas nao bloqueantes: N7 - o teste de janela de tolerancia, executado isolado, passa contra M1 porque o valor congelado ainda cai na janela de mais ou menos 1000 ms logo apos o require; o killer deterministico de M1 e o assert.notEqual de SC-005, por isso C1 segue fechado; N8 - o qa-report.md tem passagens desatualizadas apos a correcao (secao 7 sobre SC-005 contradiz o assert.notEqual, apendices reproduzem o codigo anterior e os nomes antigos child/scriptPath, secao 6 diz 31 testes, secao 2 cita tres fusos onde a 4-R2 cita dois, secao 11 traz all 11 checks passed em ingles)"
     }
   },
   "tasks_done": [
@@ -126,12 +126,13 @@
       "status": "pendente"
     }
   },
-  "updated_at": "2026-11-23T02:45:00-03:00",
+  "updated_at": "2026-11-23T03:00:00-03:00",
   "rodadas_correcao": {
     "total": 1,
     "limite": 5,
     "historico": [
-      "Rodada 1: revisao dos testes do QA (E5b) reprovou com C1 Critico e C2 Alto; devolucao ao QA"
+      "Rodada 1: revisao dos testes do QA (E5b) reprovou com C1 Critico e C2 Alto; devolucao ao QA",
+      "Rodada 1 encerrada: QA fechou C1 e C2; verificacao do Revisor aprovou com ressalvas N7 e N8. Total de rodadas de correcao usadas: 1 de 5"
     ]
   }
 }
