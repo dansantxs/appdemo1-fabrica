@@ -1,1 +1,5 @@
 node_modules/
+
+# Fábrica de Software (Claude Code)
+.claude/settings.local.json
+.claude/fabrica/slack.log.jsonl
