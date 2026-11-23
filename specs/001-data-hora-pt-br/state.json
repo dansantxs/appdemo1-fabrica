@@ -5,16 +5,21 @@
   "gh_path": "gh",
   "pull_request": null,
   "commands": {
-    "test": null,
+    "test": "npm test",
     "lint": null,
     "build": null
   },
   "last_reviewed_commit": null,
-  "stage": "PLANEJANDO",
+  "stage": "CRIANDO_TAREFAS",
   "artifacts": {
     "specs/001-data-hora-pt-br/spec.md": "E1 (speckit-specify)",
     "specs/001-data-hora-pt-br/checklists/requirements.md": "E1 (speckit-specify)",
-    ".specify/feature.json": "E1 (speckit-specify)"
+    ".specify/feature.json": "E1 (speckit-specify)",
+    "specs/001-data-hora-pt-br/plan.md": "E2 (speckit-plan)",
+    "specs/001-data-hora-pt-br/research.md": "E2 (speckit-plan)",
+    "specs/001-data-hora-pt-br/data-model.md": "E2 (speckit-plan)",
+    "specs/001-data-hora-pt-br/contracts/pagina-inicial.md": "E2 (speckit-plan)",
+    "specs/001-data-hora-pt-br/quickstart.md": "E2 (speckit-plan)"
   },
   "gates": {
     "E0": {
@@ -26,12 +31,28 @@
       "status": "aprovado",
       "devolucoes": 0,
       "notas": "speckit-specify concluido; rodada 1 de speckit-clarify concluida em 2026-11-23 com as respostas do humano (Q1=A mascara dd/mm/aaaa hh:mm:ss, Q2=B vermelho escuro legivel somente no valor, Q3=A somente a pagina inicial), gravadas em ## Clarifications > Session 2026-11-23; verificado no disco: 0 ocorrencias de NEEDS CLARIFICATION na spec.md e 16/16 itens marcados em checklists/requirements.md; aguardando aprovacao da spec pelo humano (Checkpoint 1)"
+    },
+    "E2": {
+      "status": "aprovado",
+      "devolucoes": 0,
+      "notas": "speckit-plan concluido. Verificado no disco: plan.md, research.md, data-model.md, contracts/pagina-inicial.md e quickstart.md presentes; 0 ocorrencias de NEEDS CLARIFICATION e de ERROR em plan.md; Constitution Check aprovado sem violacoes (avaliado antes da Fase 0 e reavaliado apos a Fase 1), Complexity Tracking nao aplicavel; comandos de verificacao declarados no plan.md e gravados em state.json.commands",
+      "premissas_tecnicas": [
+        "Arquiteto: substituir moment() por Intl.DateTimeFormat da stdlib com timeZone America/Sao_Paulo, hourCycle h23 e montagem via formatToParts, porque o locale pt-BR pronto insere virgula ('03/07/2026, 09:05:07') e reprovaria FR-003; moment sai como dependencia orfa",
+        "Arquiteto: tom do vermelho #8b0000, contraste 10,01:1 sobre fundo #ffffff pela formula do WCAG 2.1, contra o minimo de 4,5:1 de SC-007; #ff0000 reprovaria com 4,00:1",
+        "Arquiteto: exportar module.exports = { app, formatarDataHora } com app.listen condicionado a require.main === module, pre-requisito pratico do supertest exigido pelo Principio II",
+        "Arquiteto: comando de teste 'npm test' -> 'node --test' sem argumento posicional, porque 'node --test test/' falha no Node 22+ (posicional tratado como glob, MODULE_NOT_FOUND, saida 1)",
+        "Arquiteto: fuso irresolvivel lanca excecao na construcao do formatador no escopo do modulo, o processo nao sobe; falha visivel em vez de silenciosa, sem valor de recuo",
+        "Arquiteto: entram no escopo as pendencias de conformidade que sao pre-requisito da entrega (script test, moment sem fuso, exportacao do app, remocao do pacote npm os redundante) e a leitura de PORT de variavel de ambiente com padrao 3000; fica fora a renomeacao de getIpAddress -> obterEnderecoIp, registrada como divida, por ser alheia ao escopo (Principio I)",
+        "Arquiteto: dependencia nova supertest@^7 como devDependency, justificada por (a) FR-001..FR-011 e SC-001/002/006/008/009 so serem verificaveis na resposta HTTP renderizada e (b) a alternativa com stdlib exigir gestao manual de porta efemera e ciclo de vida do servidor, o que o Principio II proibe; as Restricoes Tecnicas ja fixam node:test + supertest como stack de testes. Saldo: +1 devDependency, -2 dependencias de runtime (moment e os)"
+      ]
     }
   },
   "tasks_done": [],
   "blockers": [
     "Projeto sem suite de testes em funcionamento: script test de package.json termina com erro; a criacao da verificacao automatizada integra esta entrega (Principio II da constituicao)",
-    ".specify/extensions.yml ausente: nenhum hook git do Spec Kit registrado; branch e commits sao feitos pelo orquestrador"
+    ".specify/extensions.yml ausente: nenhum hook git do Spec Kit registrado; branch e commits sao feitos pelo orquestrador",
+    "Divergencia desta instalacao do Spec Kit: .specify/scripts/bash/update-agent-context.sh nao existe (o nome so aparece em um comentario de common.sh) e o fluxo da skill speckit-plan instalada nao preve esse passo; confirmado por mim no disco. Nenhum arquivo de contexto do agente foi criado ou alterado na raiz. Reportar ao humano no encerramento",
+    "Divida tecnica fora do escopo desta feature (decisao do Arquiteto, Principio I): getIpAddress em app.js permanece em ingles, contrariando o Principio V; renomeacao exige feature propria"
   ],
   "human_checkpoints": {
     "specification_review": {
@@ -43,5 +64,5 @@
       "status": "pendente"
     }
   },
-  "updated_at": "2026-11-23T00:15:00-03:00"
+  "updated_at": "2026-11-23T00:30:00-03:00"
 }
