@@ -10,7 +10,7 @@
     "build": null
   },
   "last_reviewed_commit": null,
-  "stage": "AGUARDANDO_REVISAO_HUMANA",
+  "stage": "PLANEJANDO",
   "artifacts": {
     "specs/001-data-hora-pt-br/spec.md": "E1 (speckit-specify)",
     "specs/001-data-hora-pt-br/checklists/requirements.md": "E1 (speckit-specify)",
@@ -23,7 +23,7 @@
       "notas": ".specify presente; constitution.md v1.0.0 preenchida sem placeholders; arvore de trabalho limpa; remoto origin configurado; gh autenticado como dansantxs; nenhuma feature ativa anterior"
     },
     "E1": {
-      "status": "pendente",
+      "status": "aprovado",
       "devolucoes": 0,
       "notas": "speckit-specify concluido; rodada 1 de speckit-clarify concluida em 2026-11-23 com as respostas do humano (Q1=A mascara dd/mm/aaaa hh:mm:ss, Q2=B vermelho escuro legivel somente no valor, Q3=A somente a pagina inicial), gravadas em ## Clarifications > Session 2026-11-23; verificado no disco: 0 ocorrencias de NEEDS CLARIFICATION na spec.md e 16/16 itens marcados em checklists/requirements.md; aguardando aprovacao da spec pelo humano (Checkpoint 1)"
     }
@@ -35,11 +35,13 @@
   ],
   "human_checkpoints": {
     "specification_review": {
-      "status": "pendente"
+      "status": "aprovado",
+      "aprovado_em": "2026-11-23T00:15:00-03:00",
+      "mensagem": "Aprovado, pode seguir"
     },
     "merge_approval": {
       "status": "pendente"
     }
   },
-  "updated_at": "2026-11-23T00:10:00-03:00"
+  "updated_at": "2026-11-23T00:15:00-03:00"
 }
