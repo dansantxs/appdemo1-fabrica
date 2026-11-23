@@ -1,0 +1,48 @@
+{
+  "feature": "001-data-hora-pt-br",
+  "base_branch": "main",
+  "branch": "001-data-hora-pt-br",
+  "gh_path": "gh",
+  "pull_request": null,
+  "commands": {
+    "test": null,
+    "lint": null,
+    "build": null
+  },
+  "last_reviewed_commit": null,
+  "stage": "AGUARDANDO_REVISAO_HUMANA",
+  "artifacts": {
+    "specs/001-data-hora-pt-br/spec.md": "E1 (speckit-specify)",
+    "specs/001-data-hora-pt-br/checklists/requirements.md": "E1 (speckit-specify)",
+    ".specify/feature.json": "E1 (speckit-specify)"
+  },
+  "gates": {
+    "E0": {
+      "status": "aprovado",
+      "devolucoes": 0,
+      "notas": ".specify presente; constitution.md v1.0.0 preenchida sem placeholders; arvore de trabalho limpa; remoto origin configurado; gh autenticado como dansantxs; nenhuma feature ativa anterior"
+    },
+    "E1": {
+      "status": "pendente",
+      "devolucoes": 0,
+      "notas": "speckit-specify concluido; 3 marcadores [NEEDS CLARIFICATION] em aberto (FR-003 mascara pt-BR, FR-005 tom do vermelho e abrangencia do destaque, FR-010 abrangencia da regra); checklists/requirements.md com 13/16 itens atendidos, os 3 restantes dependem das mesmas decisoes de produto; aguardando respostas do humano para o speckit-clarify"
+    }
+  },
+  "tasks_done": [],
+  "blockers": [
+    "Q1 (FR-003): mascara exata do formato pt-BR nao definida - aguardando humano",
+    "Q2 (FR-005): tom do vermelho e abrangencia do destaque nao definidos - aguardando humano",
+    "Q3 (FR-010): abrangencia da regra (somente pagina inicial ou regra geral) nao definida - aguardando humano",
+    "Projeto sem suite de testes em funcionamento: script test de package.json termina com erro; a criacao da verificacao automatizada integra esta entrega (Principio II da constituicao)",
+    ".specify/extensions.yml ausente: nenhum hook git do Spec Kit registrado; branch e commits sao feitos pelo orquestrador"
+  ],
+  "human_checkpoints": {
+    "specification_review": {
+      "status": "pendente"
+    },
+    "merge_approval": {
+      "status": "pendente"
+    }
+  },
+  "updated_at": "2026-11-23T00:00:00-03:00"
+}
