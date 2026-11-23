@@ -25,14 +25,11 @@
     "E1": {
       "status": "pendente",
       "devolucoes": 0,
-      "notas": "speckit-specify concluido; 3 marcadores [NEEDS CLARIFICATION] em aberto (FR-003 mascara pt-BR, FR-005 tom do vermelho e abrangencia do destaque, FR-010 abrangencia da regra); checklists/requirements.md com 13/16 itens atendidos, os 3 restantes dependem das mesmas decisoes de produto; aguardando respostas do humano para o speckit-clarify"
+      "notas": "speckit-specify concluido; rodada 1 de speckit-clarify concluida em 2026-11-23 com as respostas do humano (Q1=A mascara dd/mm/aaaa hh:mm:ss, Q2=B vermelho escuro legivel somente no valor, Q3=A somente a pagina inicial), gravadas em ## Clarifications > Session 2026-11-23; verificado no disco: 0 ocorrencias de NEEDS CLARIFICATION na spec.md e 16/16 itens marcados em checklists/requirements.md; aguardando aprovacao da spec pelo humano (Checkpoint 1)"
     }
   },
   "tasks_done": [],
   "blockers": [
-    "Q1 (FR-003): mascara exata do formato pt-BR nao definida - aguardando humano",
-    "Q2 (FR-005): tom do vermelho e abrangencia do destaque nao definidos - aguardando humano",
-    "Q3 (FR-010): abrangencia da regra (somente pagina inicial ou regra geral) nao definida - aguardando humano",
     "Projeto sem suite de testes em funcionamento: script test de package.json termina com erro; a criacao da verificacao automatizada integra esta entrega (Principio II da constituicao)",
     ".specify/extensions.yml ausente: nenhum hook git do Spec Kit registrado; branch e commits sao feitos pelo orquestrador"
   ],
@@ -44,5 +41,5 @@
       "status": "pendente"
     }
   },
-  "updated_at": "2026-11-23T00:00:00-03:00"
+  "updated_at": "2026-11-23T00:10:00-03:00"
 }

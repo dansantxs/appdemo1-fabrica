@@ -13,8 +13,8 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
-- [ ] Requirements are testable and unambiguous
+- [x] No [NEEDS CLARIFICATION] markers remain
+- [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
 - [x] All acceptance scenarios are defined
@@ -24,7 +24,7 @@
 
 ## Feature Readiness
 
-- [ ] All functional requirements have clear acceptance criteria
+- [x] All functional requirements have clear acceptance criteria
 - [x] User scenarios cover primary flows
 - [x] Feature meets measurable outcomes defined in Success Criteria
 - [x] No implementation details leak into specification
@@ -58,6 +58,24 @@ Nenhuma correção redacional resolveria esses três itens: não se trata de tex
 e sim de decisão de produto pendente. A especificação foi deliberadamente mantida com os
 marcadores em vez de adotar palpites, e as perguntas correspondentes foram devolvidas
 para resposta humana.
+
+### Resolução dos itens reprovados (iteração 2 — 2026-11-23)
+
+Os três itens acima foram aprovados após a rodada de `/speckit-clarify` registrada em
+`spec.md` > `## Clarifications` > `### Session 2026-11-23`, que recebeu a decisão humana
+para os três pontos pendentes:
+
+1. **"No [NEEDS CLARIFICATION] markers remain"** — restam 0 marcadores na `spec.md`
+   (verificado no arquivo salvo).
+2. **"Requirements are testable and unambiguous"** — `FR-003` fixa a máscara literal
+   `dd/mm/aaaa hh:mm:ss` com exemplo preenchido (`23/11/2026 14:07:35`); `FR-005` delimita
+   o destaque ao valor, com o rótulo na cor padrão e o limite de contraste de 4,5:1
+   (`SC-007`) qualificando o "vermelho escuro legível"; `FR-010` restringe a regra à página
+   inicial de informações do servidor.
+3. **"All functional requirements have clear acceptance criteria"** — os cenários de aceite
+   de US1 passaram a asserir a cadeia exata (`03/07/2026 09:05:07`, `00:30:04`) e os de US2
+   passaram a asserir que somente o valor fica em vermelho escuro, com razão de contraste
+   mínima de 4,5:1.
 
 ### Itens aprovados — evidências
 
