@@ -3,14 +3,14 @@
   "base_branch": "main",
   "branch": "001-data-hora-pt-br",
   "gh_path": "gh",
-  "pull_request": null,
+  "pull_request": "https://github.com/dansantxs/appdemo1-fabrica/pull/1",
   "commands": {
     "test": "npm test",
     "lint": null,
     "build": null
   },
   "last_reviewed_commit": "7b90d325c1de7a57c918cb76d2db19798387187e",
-  "stage": "PUBLICANDO_PR",
+  "stage": "AGUARDANDO_MERGE",
   "artifacts": {
     "specs/001-data-hora-pt-br/spec.md": "E1 (speckit-specify)",
     "specs/001-data-hora-pt-br/checklists/requirements.md": "E1 (speckit-specify)",
@@ -96,6 +96,11 @@
       "parecer": "aprovado com ressalvas (rodada 2)",
       "escopo": "somente test/aceite/pagina-inicial.test.js, testes criados pelo QA em E6",
       "notas": "Revisao complementar dos testes do QA. Achados bloqueantes devolvidos ao QA: C1 Critico - FR-001 e FR-007/SC-005 sem assercao que os verifique; o Revisor provou por mutacao do codigo de producao em copia isolada que a suite do QA passa 31/31 com o valor congelado no carregamento do modulo e tambem com a data fixa 01/01/2000 00:00:00; as linhas 240-263 capturam valor1 e valor2, esperam 1100 ms e nunca os comparam, e o comentario justifica a omissao como probabilistica, o que e falso com intervalo maior que 1 s; o qa-report.md declara esses requisitos cobertos e zero defeitos, precisa ser corrigido. C2 Alto, portao do Principio V - identificadores novos em ingles no teste (htmlBody, scriptPath, child, match). Ressalvas anteriores: R2 fechada (o mutante sem timeZone quebra a suite), R4 fechada, R1 parcialmente fechada (faltam justamente FR-001 e FR-007). Nao bloqueantes N1 a N6 registrados no review-report.md, com destaque para N1: a assercao de IPv4 falha em host sem interface externa, falso vermelho | RODADA 2: C1 e C2 FECHADOS, confirmados por mutacao reproduzida pelo proprio Revisor em copia isolada (controle 40/40 exit 0): M1 valor congelado -> 38 pass / 2 fail; M2 data fixa 01/01/2000 -> 38 pass / 2 fail; M3 remocao do timeZone -> 37 pass / 3 fail; cada mutante rodado 2x com resultado identico. Estabilidade: 9 execucoes 40/40, incluindo TZ=UTC, Asia/Tokyo, America/Los_Angeles e Pacific/Kiritimati. Integridade confirmada: nenhum arquivo de producao alterado na rodada, nenhum teste removido ou enfraquecido (31 -> 32 testes de aceite). Novas ressalvas nao bloqueantes: N7 - o teste de janela de tolerancia, executado isolado, passa contra M1 porque o valor congelado ainda cai na janela de mais ou menos 1000 ms logo apos o require; o killer deterministico de M1 e o assert.notEqual de SC-005, por isso C1 segue fechado; N8 - o qa-report.md tem passagens desatualizadas apos a correcao (secao 7 sobre SC-005 contradiz o assert.notEqual, apendices reproduzem o codigo anterior e os nomes antigos child/scriptPath, secao 6 diz 31 testes, secao 2 cita tres fusos onde a 4-R2 cita dois, secao 11 traz all 11 checks passed em ingles)"
+    },
+    "E7": {
+      "status": "aprovado",
+      "devolucoes": 0,
+      "notas": "Sincronizacao com a base: git fetch origin e git merge origin/main -> Already up to date, sem conflito (origin/main em fbfe191). Nenhum arquivo sensivel no diff (checagem por .env, .pem, .key, secret, credential). Push de 001-data-hora-pt-br feito, PR 1 aberto para main, MERGEABLE, state OPEN. REPOSITORIO SEM CI: .github/workflows nao existe e gh pr checks responde no checks reported; conforme a regra do fluxo, a validacao de E7 passou a ser a execucao local por mim de todos os comandos de state.json.commands: npm test exit 0 (lint e build sao null neste projeto). A criacao da CI esta registrada como pendencia na descricao do PR"
     }
   },
   "tasks_done": [
@@ -114,7 +119,8 @@
     "Projeto sem suite de testes em funcionamento: script test de package.json termina com erro; a criacao da verificacao automatizada integra esta entrega (Principio II da constituicao)",
     ".specify/extensions.yml ausente: nenhum hook git do Spec Kit registrado; branch e commits sao feitos pelo orquestrador",
     "Divergencia desta instalacao do Spec Kit: .specify/scripts/bash/update-agent-context.sh nao existe (o nome so aparece em um comentario de common.sh) e o fluxo da skill speckit-plan instalada nao preve esse passo; confirmado por mim no disco. Nenhum arquivo de contexto do agente foi criado ou alterado na raiz. Reportar ao humano no encerramento",
-    "Divida tecnica fora do escopo desta feature (decisao do Arquiteto, Principio I): getIpAddress em app.js permanece em ingles, contrariando o Principio V; renomeacao exige feature propria"
+    "Divida tecnica fora do escopo desta feature (decisao do Arquiteto, Principio I): getIpAddress em app.js permanece em ingles, contrariando o Principio V; renomeacao exige feature propria",
+    "Repositorio sem CI configurada (.github/workflows ausente): a validacao de E7 foi feita por execucao local dos comandos de verificacao. A criacao da CI ficou registrada como pendencia na descricao do PR, nao foi criada por nao constar do escopo aprovado"
   ],
   "human_checkpoints": {
     "specification_review": {
@@ -126,7 +132,7 @@
       "status": "pendente"
     }
   },
-  "updated_at": "2026-11-23T03:00:00-03:00",
+  "updated_at": "2026-11-23T03:15:00-03:00",
   "rodadas_correcao": {
     "total": 1,
     "limite": 5,
