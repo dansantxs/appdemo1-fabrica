@@ -97,7 +97,7 @@ Projeto único, sem `src/`: `app.js` e `views/index.ejs` na raiz, conforme `plan
 
 **Purpose**: validação cruzada exigida pelos critérios de sucesso que atravessam as três histórias, antes de entregar ao QA (E6).
 
-- [ ] T010 Executar `npm test` três vezes consecutivas e, em seguida, uma vez sob cada um de `TZ=UTC`, `TZ=America/Sao_Paulo` e `TZ=Asia/Tokyo`, confirmando código de saída `0` em todas as execuções (`SC-002`, `SC-006`; `quickstart.md` Validação 1). Não altera nenhum arquivo de produto; é a confirmação de que o script `test` ajustado em T001 e os testes de T007/T009 são determinísticos e independentes do fuso do host. Depende de T001–T009 (todas as fases anteriores concluídas).
+- [X] T010 Executar `npm test` três vezes consecutivas e, em seguida, uma vez sob cada um de `TZ=UTC`, `TZ=America/Sao_Paulo` e `TZ=Asia/Tokyo`, confirmando código de saída `0` em todas as execuções (`SC-002`, `SC-006`; `quickstart.md` Validação 1). Não altera nenhum arquivo de produto; é a confirmação de que o script `test` ajustado em T001 e os testes de T007/T009 são determinísticos e independentes do fuso do host. Depende de T001–T009 (todas as fases anteriores concluídas).
 
 **Checkpoint final**: `npm test` verde em três execuções e três fusos de host; feature pronta para a etapa de QA (E5/E6, `test/aceite/` e demais validações do `quickstart.md`).
 

@@ -10,7 +10,7 @@
     "build": null
   },
   "last_reviewed_commit": null,
-  "stage": "IMPLEMENTANDO",
+  "stage": "REVISANDO",
   "artifacts": {
     "specs/001-data-hora-pt-br/spec.md": "E1 (speckit-specify)",
     "specs/001-data-hora-pt-br/checklists/requirements.md": "E1 (speckit-specify)",
@@ -58,16 +58,17 @@
       "notas": "speckit-analyze executado pelo orquestrador (somente leitura). 0 achados CRITICAL. Cobertura por tarefa 11/16 (69%). Achados nao bloqueantes, a levar para a descricao do PR: C1 MEDIUM - FR-006, FR-008, FR-009, FR-010 e SC-009 sem tarefa, cobertura deliberadamente atribuida ao QA em test/aceite/ (exigir no handoff de E6 as assercoes de contracts/pagina-inicial.md secao 2); C2 LOW - SC-003, SC-004 e SC-005 so com verificacao manual do quickstart, exigir evidencia no qa-report.md; F1 LOW - deriva de rotulo de etapa, plan.md chama os testes de aceite do QA de E5 enquanto no fluxo da fabrica QA e E6; F2 LOW - T007 declara dependencia de T003 mas precisa do module.exports de T005, resolvido pelo portao da Fase 2. Medicao propria do orquestrador: 'node --test' sem nenhum arquivo de teste sai com codigo 0 (tests 0), caso ausente das medicoes de research.md D6, portanto o portao apos a fase de Setup nao falha por ausencia de testes"
     },
     "E4": {
-      "status": "em andamento",
+      "status": "aprovado",
       "devolucoes": 0,
       "fases_concluidas": [
         "Fase 1 Setup (T001)",
         "Fase 2 Foundational (T002-T005)",
         "Fase 3 US1 (T006, T007)",
         "Fase 4 US2 (T008)",
-        "Fase 5 US3 (T009)"
+        "Fase 5 US3 (T009)",
+        "Fase 6 Polish (T010)"
       ],
-      "notas": "Fase 1 Setup concluida. Verificado no disco: package.json sem moment e sem os, com supertest ^7.3.2 em devDependencies, script test = node --test, express e ejs preservados; package-lock.json regravado no mesmo passo; app.js e views/index.ejs intocados; T001 marcado [X] em tasks.md. Portao executado por mim: npm test saiu com codigo 0 (tests 0, sem arquivos de teste ainda, conforme medido em E3.5) | Fase 2 Foundational concluida. Verificado no disco: app.js com formatador Intl no escopo do modulo (sem try/catch, D3), funcao pura formatarDataHora via formatToParts, port lido de process.env.PORT com padrao 3000, app.listen sob require.main === module, module.exports = { app, formatarDataHora }; getIpAddress inalterada (fora de escopo, D9); views/index.ejs, package.json e package-lock.json intocados nesta fase. Portoes executados por mim: npm test exit 0; require(./app.js) carrega sem abrir porta e imprime function function; formatarDataHora(2026-07-03T12:05:07Z) = 03/07/2026 09:05:07; sob TZ=Asia/Tokyo o instante 2026-11-24T03:00:00Z = 24/11/2026 00:00:00 com 19 caracteres | Fase 3 US1 concluida. T006 conferida (handler de GET / usa formatarDataHora(new Date()), instante lido por requisicao, sem cache) e T007 criada: test/unidade/data-hora.test.js com os 5 pares de referencia do contrato (cadeia exata + 19 caracteres) e o teste de invariancia a process.env.TZ. Portoes executados por mim: npm test = 6 tests, 6 pass, 0 fail, exit 0; TZ=UTC npm test exit 0; TZ=Asia/Tokyo npm test exit 0; resultado identico em execucoes repetidas | Fases 4 e 5 concluidas. T008: views/index.ejs com span style=color: #8b0000 envolvendo somente o valor, rotulo Hora Atual do Servidor fora do span, demais linhas (IP, h1, title, lang=pt-br) identicas, sem script/style/CSS externo. T009: dois testes novos de ausencia de cache em test/unidade/data-hora.test.js, sem alterar os 6 anteriores. Portoes executados por mim: npm test = 8 tests, 8 pass, 0 fail, exit 0; HTML renderizado conferido pelo Desenvolvedor via http+fetch, sem script, fetch(, setInterval nem http-equiv=refresh",
+      "notas": "Fase 1 Setup concluida. Verificado no disco: package.json sem moment e sem os, com supertest ^7.3.2 em devDependencies, script test = node --test, express e ejs preservados; package-lock.json regravado no mesmo passo; app.js e views/index.ejs intocados; T001 marcado [X] em tasks.md. Portao executado por mim: npm test saiu com codigo 0 (tests 0, sem arquivos de teste ainda, conforme medido em E3.5) | Fase 2 Foundational concluida. Verificado no disco: app.js com formatador Intl no escopo do modulo (sem try/catch, D3), funcao pura formatarDataHora via formatToParts, port lido de process.env.PORT com padrao 3000, app.listen sob require.main === module, module.exports = { app, formatarDataHora }; getIpAddress inalterada (fora de escopo, D9); views/index.ejs, package.json e package-lock.json intocados nesta fase. Portoes executados por mim: npm test exit 0; require(./app.js) carrega sem abrir porta e imprime function function; formatarDataHora(2026-07-03T12:05:07Z) = 03/07/2026 09:05:07; sob TZ=Asia/Tokyo o instante 2026-11-24T03:00:00Z = 24/11/2026 00:00:00 com 19 caracteres | Fase 3 US1 concluida. T006 conferida (handler de GET / usa formatarDataHora(new Date()), instante lido por requisicao, sem cache) e T007 criada: test/unidade/data-hora.test.js com os 5 pares de referencia do contrato (cadeia exata + 19 caracteres) e o teste de invariancia a process.env.TZ. Portoes executados por mim: npm test = 6 tests, 6 pass, 0 fail, exit 0; TZ=UTC npm test exit 0; TZ=Asia/Tokyo npm test exit 0; resultado identico em execucoes repetidas | Fases 4 e 5 concluidas. T008: views/index.ejs com span style=color: #8b0000 envolvendo somente o valor, rotulo Hora Atual do Servidor fora do span, demais linhas (IP, h1, title, lang=pt-br) identicas, sem script/style/CSS externo. T009: dois testes novos de ausencia de cache em test/unidade/data-hora.test.js, sem alterar os 6 anteriores. Portoes executados por mim: npm test = 8 tests, 8 pass, 0 fail, exit 0; HTML renderizado conferido pelo Desenvolvedor via http+fetch, sem script, fetch(, setInterval nem http-equiv=refresh | Fase 6 Polish concluida e E4 APROVADA. Verificado por mim no disco: 0 tarefas pendentes e 10 marcadas [X] em tasks.md; npm test exit 0. T010 executou 6 verificacoes (3x npm test + TZ=UTC + TZ=America/Sao_Paulo + TZ=Asia/Tokyo), todas com 8 tests, 8 pass, 0 fail, exit 0. Nenhum arquivo de controle na raiz do projeto",
       "premissas_tecnicas": [
         "Desenvolvedor (Fase 2): antecipou a troca de uma linha do handler de GET / para formatarDataHora(new Date()), conteudo de T006, porque remover o require(moment) em T002 deixaria a rota quebrando em tempo de execucao (ReferenceError) sem teste para capturar, ja que T007 so chega na Fase 3. Decisao aceita pelo orquestrador: evita estado deliberadamente quebrado e nao antecipa nenhuma outra tarefa. T006 permanece desmarcada e sera confirmada na Fase 3",
         "Desenvolvedor (Fase 3): uso de describe/test do node:test para agrupar os casos sob o nome da funcao, decisao de estilo, sem efeito sobre API ou contrato"
@@ -83,7 +84,8 @@
     "T006",
     "T007",
     "T008",
-    "T009"
+    "T009",
+    "T010"
   ],
   "blockers": [
     "Projeto sem suite de testes em funcionamento: script test de package.json termina com erro; a criacao da verificacao automatizada integra esta entrega (Principio II da constituicao)",
@@ -101,5 +103,5 @@
       "status": "pendente"
     }
   },
-  "updated_at": "2026-11-23T01:45:00-03:00"
+  "updated_at": "2026-11-23T02:00:00-03:00"
 }
